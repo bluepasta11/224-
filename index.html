@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg:#131010;
@@ -425,7 +427,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = "applications_224";
+// ====== 1) 여기에 본인 Firebase 프로젝트 설정값을 붙여넣으세요 ======
+// Firebase 콘솔(console.firebase.google.com) > 프로젝트 설정 > 일반 > 내 앱(웹 앱)에서 확인
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = "applications_224";
+
 // Set your own admin password here.
 const ADMIN_PASSWORD = "224admin";
 
@@ -672,13 +687,18 @@ function showToast(msg){
 
 async function loadApplications(){
   try{
-    const res = await window.storage.get(STORAGE_KEY, true);
-    if(res && res.value){ return JSON.parse(res.value); }
+    const snap = await db.collection(COLLECTION).orderBy("submittedAt","desc").get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }catch(e){
+    console.error("loadApplications failed:", e);
     return [];
-  }catch(e){ return []; }
+  }
 }
-async function saveApplications(list){
-  await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
+async function addApplication(entry){
+  await db.collection(COLLECTION).add(entry);
+}
+async function deleteApplication(id){
+  await db.collection(COLLECTION).doc(id).delete();
 }
 
 document.getElementById("submitBtn").addEventListener("click", async ()=>{
@@ -697,7 +717,6 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   if(!valid){ showToast(t("requiredError")); return; }
 
   const entry = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
     nickname, server, uid,
     troop: selectedTroop || "",
     power: power || "",
@@ -711,9 +730,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   submitBtn.textContent = "...";
 
   try{
-    const list = await loadApplications();
-    list.push(entry);
-    await saveApplications(list);
+    await addApplication(entry);
 
     const box = document.getElementById("summaryBox");
     box.innerHTML = "";
@@ -835,8 +852,7 @@ async function renderAdminList(){
     btn.addEventListener("click", async ()=>{
       if(!confirm(t("deleteConfirm"))) return;
       const id = btn.dataset.id;
-      const current = await loadApplications();
-      await saveApplications(current.filter(e=>e.id !== id));
+      await deleteApplication(id);
       showToast(t("deleted"));
       await renderAdminList();
     });
