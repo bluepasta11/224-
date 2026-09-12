@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>224 Server Transfer Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131010;
+    --bg2:#1a1512;
+    --panel:#1f1a15;
+    --panel2:#28211a;
+    --line:#3d3024;
+    --line-soft:#2a2119;
+    --accent:#ff7a1a;
+    --accent2:#ffb648;
+    --accent-deep:#b5480a;
+    --text:#f4ede0;
+    --text-dim:#b3a48d;
+    --text-faint:#726554;
+    --ok:#8bd35c;
+    --danger:#e2564a;
+    --console:#39d97a;
+    --console-dim:#1d7f4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(255,122,26,0.10), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Noto Sans KR','Noto Sans JP','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    min-height:100vh;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 10px);
+    pointer-events:none;
+  }
+  .num{font-family:'Oswald','Noto Sans KR',sans-serif;}
+  .scene{max-width:600px;margin:0 auto;padding-bottom:70px;}
+
+  /* ---- banner ---- */
+  .banner{
+    position:relative;
+    padding:16px 18px 34px;
+    background:linear-gradient(160deg,#241a11 0%, #1a1310 65%);
+    border-bottom:1px solid var(--line);
+    clip-path:polygon(0 0,100% 0,100% 88%,0 100%);
+  }
+  .banner-top{display:flex;align-items:center;justify-content:flex-end;}
+  .langbar{display:flex;gap:6px;}
+  .langbtn{
+    font-family:'Oswald',sans-serif;
+    padding:7px 12px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-faint);
+    font-size:12px;font-weight:600;letter-spacing:0.03em;
+    cursor:pointer;
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+    transition:all .15s;
+  }
+  .langbtn.active{border-color:var(--accent);color:var(--accent2);background:rgba(255,122,26,0.1);}
+  .langbtn:hover:not(.active){color:var(--text);border-color:#54432f;}
+
+  /* ---- emblem ---- */
+  .emblem-wrap{display:flex;justify-content:center;margin-top:-46px;position:relative;z-index:3;}
+  .emblem{
+    width:104px;height:104px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #2c2118, #171310 70%);
+    border:2px solid var(--accent);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 0 0 5px var(--bg), 0 14px 30px -8px rgba(0,0,0,0.7);
+    position:relative;
+  }
+  .emblem::before{
+    content:"";position:absolute;inset:-9px;border-radius:50%;
+    border:1.5px dashed rgba(255,122,26,0.4);
+    animation:spin 50s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .emblem-number{font-family:'Oswald',sans-serif;font-size:27px;font-weight:700;color:var(--accent2);letter-spacing:0.02em;line-height:1;}
+  .emblem-tag{font-size:9.5px;color:var(--text-faint);margin-top:4px;letter-spacing:0.04em;}
+
+  /* ---- hero ---- */
+  .hero{text-align:center;padding:26px 24px 0;}
+  .title{margin:0 0 22px;}
+  .title-num{
+    display:block;
+    font-family:'Oswald',sans-serif;
+    font-size:76px;font-weight:700;line-height:0.95;
+    background:linear-gradient(180deg,var(--accent2),var(--accent-deep));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    letter-spacing:-0.01em;
+  }
+  .title-rest{
+    display:block;
+    font-size:17px;font-weight:700;color:var(--text);
+    margin-top:6px;letter-spacing:0.01em;
+  }
+  .route{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .route-chip{
+    font-family:'Oswald',sans-serif;
+    font-size:12.5px;font-weight:600;letter-spacing:0.02em;
+    padding:8px 14px;border:1px solid var(--line);color:var(--text-dim);
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  }
+  .route-chip.to{border-color:var(--accent);color:var(--accent2);background:rgba(255,122,26,0.08);}
+  .route-arrow{color:var(--text-faint);font-size:16px;}
+  .designed{font-size:12px;color:var(--text-faint);margin:0 0 6px;}
+  .designed b{color:var(--accent2);font-weight:700;}
+
+  /* ---- tear ---- */
+  .tear{
+    height:20px;margin:26px 20px 0;
+    background-image:radial-gradient(circle, var(--bg) 3.5px, transparent 3.6px);
+    background-size:16px 20px;background-position:top center;background-repeat:repeat-x;
+    border-top:1px dashed var(--line);
+  }
+
+  /* ---- doc card ---- */
+  .doc-card{
+    margin:0 16px 22px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-top:none;
+    padding:30px 22px 26px;
+    clip-path:polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .step{display:flex;align-items:center;gap:12px;margin:0 0 22px;}
+  .step:not(:first-child){margin-top:8px;}
+  .step-badge{
+    font-family:'Oswald',sans-serif;
+    width:30px;height:30px;border-radius:50%;
+    border:1.5px solid var(--accent);
+    color:var(--accent2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;flex-shrink:0;
+  }
+  .step-badge.alt{border-color:#55606a;color:#9fb0bc;}
+  .step-title{font-size:15px;font-weight:700;color:var(--text);}
+  .step-rule{flex:1;height:1px;background:var(--line);}
+
+  label.field-label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:7px;font-weight:500;}
+  label.field-label .req{color:var(--accent);margin-left:3px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:420px){.row2{grid-template-columns:1fr;}}
+
+  input[type=text]{
+    width:100%;background:var(--bg2);border:1px solid var(--line);
+    padding:12px 13px;color:var(--text);font-size:15px;outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input::placeholder{color:var(--text-faint);}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,122,26,0.14);}
+  input.invalid{border-color:var(--danger);}
+  #f_uid{font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;font-size:14px;}
+
+  .field{margin-bottom:18px;}
+  .uid-wrap{position:relative;}
+  .uid-counter{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
+
+  .warnbox{
+    background:rgba(226,86,74,0.08);border:1px solid rgba(226,86,74,0.3);
+    padding:12px 14px;font-size:12.5px;line-height:1.65;color:#e79a92;margin-bottom:8px;
+  }
+
+  .troop-group{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .troop-btn{
+    background:var(--bg2);border:1px solid var(--line);
+    padding:14px 6px 12px;color:var(--text-dim);
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+    cursor:pointer;font-size:12.5px;font-weight:600;
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    transition:all .15s;
+  }
+  .troop-btn svg{width:22px;height:22px;stroke:var(--text-faint);fill:none;stroke-width:1.7;transition:stroke .15s;}
+  .troop-btn.selected{border-color:var(--accent);background:rgba(255,122,26,0.1);color:var(--accent2);}
+  .troop-btn.selected svg{stroke:var(--accent2);}
+  .troop-btn:hover:not(.selected){border-color:#54432f;color:var(--text);}
+
+  .errmsg{color:var(--danger);font-size:11.5px;margin-top:6px;display:none;}
+  .errmsg.show{display:block;}
+
+  .submit-btn{
+    width:100%;margin-top:8px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent-deep));
+    border:none;padding:15px;color:#1a1310;font-size:15.5px;font-weight:700;
+    cursor:pointer;letter-spacing:0.01em;
+    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    transition:filter .15s, transform .1s;
+  }
+  .submit-btn:hover{filter:brightness(1.07);}
+  .submit-btn:active{transform:scale(0.99);}
+
+  /* ---- success ---- */
+  .success{text-align:center;padding:6px 0 4px;}
+  .stamp-wrap{display:flex;justify-content:center;margin-bottom:22px;}
+  .stamp{
+    width:112px;height:112px;border-radius:50%;
+    border:3px double var(--ok);
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-9deg);
+    color:var(--ok);
+    font-family:'Oswald',sans-serif;
+    font-size:15px;font-weight:700;letter-spacing:0.04em;
+    text-align:center;line-height:1.3;
+    animation:stampIn .35s cubic-bezier(.2,1.4,.4,1);
+    padding:8px;
+  }
+  @keyframes stampIn{from{transform:rotate(-9deg) scale(1.7);opacity:0;}to{transform:rotate(-9deg) scale(1);opacity:1;}}
+  .success h3{font-size:19px;margin:0 0 8px;font-weight:800;}
+  .success p{color:var(--text-dim);font-size:13.5px;margin:0 0 22px;}
+  .summary{text-align:left;background:var(--bg2);border:1px solid var(--line);padding:15px 17px;margin-bottom:20px;font-size:13.5px;}
+  .summary div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line-soft);}
+  .summary div:last-child{border-bottom:none;}
+  .summary span:first-child{color:var(--text-dim);}
+  .summary span:last-child{color:var(--text);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .ghost-btn{
+    width:100%;background:transparent;border:1px solid var(--line);
+    padding:12px;color:var(--text-dim);font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:#54432f;color:var(--text);}
+
+  .privacy-note{font-size:11px;color:var(--text-faint);text-align:center;margin:0 24px 26px;line-height:1.7;}
+
+  /* ---- admin: console styling, deliberately distinct from the form above ---- */
+  .admin-dock{margin:0 16px;font-family:'JetBrains Mono',monospace;}
+  .admin-toggle{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;border:1px solid var(--console-dim);
+    background:#0b0d0b;
+    color:var(--console);font-size:12.5px;font-weight:600;cursor:pointer;
+    letter-spacing:0.03em;
+  }
+  .admin-toggle:hover{border-color:var(--console);}
+  .admin-toggle .lockflag::before{content:"[ ";}
+  .admin-toggle .lockflag::after{content:" ]";}
+  .admin-panel{border:1px solid var(--console-dim);border-top:none;padding:20px 18px 22px;background:#0b0d0b;}
+  .admin-login{display:flex;gap:8px;}
+  .admin-login input{
+    flex:1;background:#101410;border:1px solid var(--console-dim);color:var(--console);
+    font-family:'JetBrains Mono',monospace;padding:11px 12px;font-size:13px;outline:none;
+  }
+  .admin-login input::placeholder{color:var(--console-dim);}
+  .admin-login input:focus{border-color:var(--console);}
+  .admin-login button{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--console);border:none;padding:0 16px;color:#08130c;font-weight:600;font-size:12.5px;cursor:pointer;
+  }
+  .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .admin-header h3{font-size:13px;margin:0;font-weight:600;color:var(--console);letter-spacing:0.03em;}
+  .admin-actions{display:flex;gap:7px;}
+  .small-btn{
+    background:transparent;border:1px solid var(--console-dim);padding:6px 11px;color:var(--console);font-size:11px;font-weight:600;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .small-btn:hover{border-color:var(--console);color:#c8ffe0;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px;font-family:'JetBrains Mono',monospace;}
+  th{text-align:left;color:var(--console-dim);font-weight:600;padding:7px 9px;border-bottom:1px solid var(--console-dim);white-space:nowrap;}
+  td{padding:9px 9px;border-bottom:1px solid #14201a;color:#cfe9da;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  .del-btn{background:none;border:1px solid rgba(226,86,74,0.5);color:#e79a92;padding:3px 8px;font-size:10.5px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
+  .del-btn:hover{background:rgba(226,86,74,0.12);}
+  .empty-state{text-align:center;color:var(--console-dim);padding:26px 0;font-size:12.5px;}
+  .errmsg.console-err{font-family:'JetBrains Mono',monospace;}
+
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    background:#241a11;border:1px solid var(--line);color:var(--text);
+    padding:10px 18px;font-size:12.5px;font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="scene">
+
+  <header class="banner">
+    <div class="banner-top">
+      <div class="langbar">
+        <button class="langbtn active" data-lang="ko">한국어</button>
+        <button class="langbtn" data-lang="en">EN</button>
+        <button class="langbtn" data-lang="ja">日本語</button>
+        <button class="langbtn" data-lang="zh">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="emblem-wrap">
+    <div class="emblem">
+      <div class="emblem-number">224</div>
+      <div class="emblem-tag" data-i="emblemTag"></div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <h1 class="title">
+      <span class="title-num">224</span>
+      <span class="title-rest" data-i="titleRest"></span>
+    </h1>
+    <div class="route">
+      <span class="route-chip" data-i="routeFrom"></span>
+      <span class="route-arrow">→</span>
+      <span class="route-chip to" data-i="routeTo"></span>
+    </div>
+    <p class="designed"><span data-i="designedByPrefix"></span> <b>곰사탕</b></p>
+  </section>
+
+  <div class="tear"></div>
+
+  <main class="doc-card">
+    <div id="formView">
+      <div class="step">
+        <span class="step-badge num">1</span>
+        <span class="step-title" data-i="sectionPlayer"></span>
+        <span class="step-rule"></span>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label"><span data-i="nickname"></span><span class="req">*</span></label>
+          <input type="text" id="f_nickname" data-i-ph="nicknamePh" maxlength="40" />
+        </div>
+        <div class="field">
+          <label class="field-label"><span data-i="currentServer"></span><span class="req">*</span></label>
+          <input type="text" id="f_server" data-i-ph="currentServerPh" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><span data-i="uidLabel"></span><span class="req">*</span></label>
+        <div class="uid-wrap">
+          <input type="text" id="f_uid" inputmode="numeric" data-i-ph="uidPh" maxlength="16" />
+          <span class="uid-counter" id="uidCounter">0/16</span>
+        </div>
+        <div class="errmsg" id="uidErr" data-i="uidError"></div>
+      </div>
+
+      <div class="warnbox" data-i="uidWarning"></div>
+
+      <div class="step" style="margin-top:26px;">
+        <span class="step-badge alt num">2</span>
+        <span class="step-title" data-i="sectionOptional"></span>
+        <span class="step-rule"></span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" data-i="troopType"></label>
+        <div class="troop-group">
+          <button type="button" class="troop-btn" data-troop="fighter">
+            <svg viewBox="0 0 24 24"><path d="M14.5 3.5 20 9l-9.5 9.5-3-3M14.5 3.5 12 6M20 9l-2.5 2.5M4 20l3-3"/></svg>
+            <span data-i="fighter"></span>
+          </button>
+          <button type="button" class="troop-btn" data-troop="shooter">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            <span data-i="shooter"></span>
+          </button>
+          <button type="button" class="troop-btn" data-troop="rider">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3M6.5 6.5l2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2"/></svg>
+            <span data-i="rider"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" data-i="power"></label>
+        <input type="text" id="f_power" inputmode="numeric" data-i-ph="powerPh" maxlength="20" />
+      </div>
+
+      <button class="submit-btn" id="submitBtn" data-i="submit"></button>
+    </div>
+
+    <div id="successView" style="display:none;">
+      <div class="success">
+        <div class="stamp-wrap"><div class="stamp" data-i="stampText"></div></div>
+        <h3 data-i="successTitle"></h3>
+        <p data-i="successDesc"></p>
+        <div class="summary" id="summaryBox"></div>
+        <button class="ghost-btn" id="newAppBtn" data-i="newApp"></button>
+      </div>
+    </div>
+  </main>
+
+  <p class="privacy-note" data-i="privacyNote"></p>
+
+  <div class="admin-dock">
+    <div class="admin-toggle" id="adminToggle">
+      <span data-i="adminPanel"></span>
+      <span class="lockflag" id="lockIcon"></span>
+    </div>
+    <div class="admin-panel" id="adminPanel" style="display:none;">
+      <div id="adminLoginView">
+        <div class="admin-login">
+          <input type="text" id="adminPw" data-i-ph="adminPasswordPh" autocomplete="off" />
+          <button id="adminEnterBtn" data-i="adminEnter"></button>
+        </div>
+        <div class="errmsg console-err" id="adminErr" data-i="adminWrong"></div>
+      </div>
+      <div id="adminDataView" style="display:none;">
+        <div class="admin-header">
+          <h3 data-i="adminTitle"></h3>
+          <div class="admin-actions">
+            <button class="small-btn" id="copyCsvBtn" data-i="adminCopy"></button>
+            <button class="small-btn" id="closeAdminBtn" data-i="adminClose"></button>
+          </div>
+        </div>
+        <div id="adminList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "applications_224";
+// Set your own admin password here.
+const ADMIN_PASSWORD = "224admin";
+
+const I18N = {
+  ko: {
+    emblemTag: "서버 이민",
+    titleRest: "서버 이민 신청",
+    routeFrom: "다른 서버",
+    routeTo: "224서버",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "플레이어 정보",
+    sectionOptional: "추가 정보 (선택)",
+    nickname: "닉네임",
+    nicknamePh: "게임 내 닉네임",
+    currentServer: "현재 서버 번호",
+    currentServerPh: "예: 111",
+    uidLabel: "UID (16자리)",
+    uidPh: "숫자 16자리 입력",
+    uidError: "UID는 숫자 16자리로 입력해주세요.",
+    uidWarning: "⚠ UID는 게임 내 프로필에서 정확히 확인 후 입력해주세요. 잘못된 UID 입력 시 이민 처리가 불가할 수 있습니다.",
+    troopType: "1군 병종",
+    fighter: "파이터",
+    shooter: "슈터",
+    rider: "라이더",
+    power: "1군 전투력",
+    powerPh: "예: 1.2억",
+    submit: "확인 후 신청서 작성하기 →",
+    requiredError: "필수 항목(닉네임, 현재 서버, UID 16자리)을 모두 입력해주세요.",
+    stampText: "접수완료",
+    successTitle: "신청이 완료되었습니다!",
+    successDesc: "운영진 확인 후 안내드리겠습니다.",
+    newApp: "새 신청서 작성",
+    privacyNote: "제출된 정보는 224서버 운영진에게 전달되며 이민 심사 목적으로만 사용됩니다.",
+    adminPanel: "운영진 관리 패널",
+    adminLocked: "LOCKED",
+    adminUnlocked: "ACCESS OK",
+    adminPasswordPh: "관리자 비밀번호",
+    adminEnter: "입장",
+    adminWrong: "비밀번호가 올바르지 않습니다.",
+    adminTitle: "신청 목록 관리",
+    adminEmpty: "아직 접수된 신청이 없습니다.",
+    adminDelete: "삭제",
+    adminCopy: "CSV 복사",
+    adminCopied: "클립보드에 복사되었습니다.",
+    adminClose: "닫기",
+    colNickname: "닉네임", colServer: "서버", colUid: "UID", colTroop: "병종", colPower: "전투력", colTime: "접수시각",
+    notSet: "-", deleteConfirm: "이 신청서를 삭제할까요?", deleted: "삭제되었습니다.",
+    submitted: "신청서가 접수되었습니다."
+  },
+  en: {
+    emblemTag: "Server Transfer",
+    titleRest: "Server Immigration",
+    routeFrom: "Other Server",
+    routeTo: "224 Server",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "Player Info",
+    sectionOptional: "Additional Info (Optional)",
+    nickname: "Nickname",
+    nicknamePh: "In-game nickname",
+    currentServer: "Current Server No.",
+    currentServerPh: "e.g. 111",
+    uidLabel: "UID (16 digits)",
+    uidPh: "Enter 16 digit number",
+    uidError: "UID must be exactly 16 digits.",
+    uidWarning: "⚠ Please double-check your UID in your in-game profile before entering it. An incorrect UID may prevent your transfer from being processed.",
+    troopType: "Primary Troop Type",
+    fighter: "Fighter",
+    shooter: "Shooter",
+    rider: "Rider",
+    power: "Primary Power",
+    powerPh: "e.g. 120M",
+    submit: "Confirm & Submit Application →",
+    requiredError: "Please fill in all required fields (Nickname, Current Server, 16-digit UID).",
+    stampText: "RECEIVED",
+    successTitle: "Application submitted!",
+    successDesc: "Our staff will review it and get back to you.",
+    newApp: "Submit another application",
+    privacyNote: "Submitted information is shared with the 224 Server staff and used only for immigration review.",
+    adminPanel: "Staff Admin Panel",
+    adminLocked: "LOCKED",
+    adminUnlocked: "ACCESS OK",
+    adminPasswordPh: "Admin password",
+    adminEnter: "Enter",
+    adminWrong: "Incorrect password.",
+    adminTitle: "Manage Applications",
+    adminEmpty: "No applications yet.",
+    adminDelete: "Delete",
+    adminCopy: "Copy CSV",
+    adminCopied: "Copied to clipboard.",
+    adminClose: "Close",
+    colNickname: "Nickname", colServer: "Server", colUid: "UID", colTroop: "Troop", colPower: "Power", colTime: "Submitted",
+    notSet: "-", deleteConfirm: "Delete this application?", deleted: "Deleted.",
+    submitted: "Application submitted."
+  },
+  ja: {
+    emblemTag: "サーバー移民",
+    titleRest: "サーバー移民申請",
+    routeFrom: "他サーバー",
+    routeTo: "224サーバー",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "プレイヤー情報",
+    sectionOptional: "追加情報（任意）",
+    nickname: "ニックネーム",
+    nicknamePh: "ゲーム内ニックネーム",
+    currentServer: "現在のサーバー番号",
+    currentServerPh: "例：111",
+    uidLabel: "UID（16桁）",
+    uidPh: "16桁の数字を入力",
+    uidError: "UIDは16桁の数字で入力してください。",
+    uidWarning: "⚠ UIDはゲーム内プロフィールで正確に確認してから入力してください。誤ったUIDを入力すると移民処理ができない場合があります。",
+    troopType: "主力兵種",
+    fighter: "ファイター",
+    shooter: "シューター",
+    rider: "ライダー",
+    power: "主力戦力",
+    powerPh: "例：1.2億",
+    submit: "確認して申請する →",
+    requiredError: "必須項目（ニックネーム、現在のサーバー、UID16桁）をすべて入力してください。",
+    stampText: "受付完了",
+    successTitle: "申請が完了しました！",
+    successDesc: "運営スタッフが確認後、ご案内いたします。",
+    newApp: "新しい申請書を作成",
+    privacyNote: "送信された情報は224サーバー運営スタッフに共有され、移民審査のみに使用されます。",
+    adminPanel: "運営管理パネル",
+    adminLocked: "LOCKED",
+    adminUnlocked: "ACCESS OK",
+    adminPasswordPh: "管理者パスワード",
+    adminEnter: "入場",
+    adminWrong: "パスワードが正しくありません。",
+    adminTitle: "申請リスト管理",
+    adminEmpty: "まだ申請がありません。",
+    adminDelete: "削除",
+    adminCopy: "CSVをコピー",
+    adminCopied: "クリップボードにコピーしました。",
+    adminClose: "閉じる",
+    colNickname: "ニックネーム", colServer: "サーバー", colUid: "UID", colTroop: "兵種", colPower: "戦力", colTime: "受付時刻",
+    notSet: "-", deleteConfirm: "この申請を削除しますか？", deleted: "削除しました。",
+    submitted: "申請が送信されました。"
+  },
+  zh: {
+    emblemTag: "服务器迁移",
+    titleRest: "服 移民申请",
+    routeFrom: "其他服",
+    routeTo: "224服",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "玩家信息",
+    sectionOptional: "附加信息（可选）",
+    nickname: "昵称",
+    nicknamePh: "游戏内昵称",
+    currentServer: "当前服务器编号",
+    currentServerPh: "例：111",
+    uidLabel: "UID（16位）",
+    uidPh: "请输入16位数字",
+    uidError: "UID必须为16位数字。",
+    uidWarning: "⚠ 请在游戏内个人资料中仔细核对UID后再填写。UID填写错误可能导致无法完成迁服处理。",
+    troopType: "主力兵种",
+    fighter: "战士",
+    shooter: "射手",
+    rider: "骑兵",
+    power: "主力战力",
+    powerPh: "例：1.2亿",
+    submit: "确认并提交申请 →",
+    requiredError: "请填写所有必填项（昵称、当前服务器、16位UID）。",
+    stampText: "已受理",
+    successTitle: "申请提交成功！",
+    successDesc: "管理团队审核后会与您联系。",
+    newApp: "提交新的申请",
+    privacyNote: "提交的信息将发送给224服管理团队，仅用于迁服审核。",
+    adminPanel: "管理员面板",
+    adminLocked: "LOCKED",
+    adminUnlocked: "ACCESS OK",
+    adminPasswordPh: "管理员密码",
+    adminEnter: "进入",
+    adminWrong: "密码不正确。",
+    adminTitle: "申请列表管理",
+    adminEmpty: "暂无申请。",
+    adminDelete: "删除",
+    adminCopy: "复制CSV",
+    adminCopied: "已复制到剪贴板。",
+    adminClose: "关闭",
+    colNickname: "昵称", colServer: "服务器", colUid: "UID", colTroop: "兵种", colPower: "战力", colTime: "提交时间",
+    notSet: "-", deleteConfirm: "确定要删除此申请吗？", deleted: "已删除。",
+    submitted: "申请已提交。"
+  }
+};
+
+let currentLang = "ko";
+let selectedTroop = null;
+let adminAuthed = false;
+
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.ko[key] || key; }
+
+function applyLang(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll("[data-i]").forEach(el=>{
+    el.textContent = t(el.getAttribute("data-i"));
+  });
+  document.querySelectorAll("[data-i-ph]").forEach(el=>{
+    el.placeholder = t(el.getAttribute("data-i-ph"));
+  });
+  document.querySelectorAll(".langbtn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang === currentLang);
+  });
+  document.getElementById("lockIcon").textContent = adminAuthed ? t("adminUnlocked") : t("adminLocked");
+}
+
+document.querySelectorAll(".langbtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    currentLang = btn.dataset.lang;
+    applyLang();
+  });
+});
+
+document.querySelectorAll(".troop-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const val = btn.dataset.troop;
+    selectedTroop = (selectedTroop === val) ? null : val;
+    document.querySelectorAll(".troop-btn").forEach(b=>{
+      b.classList.toggle("selected", b.dataset.troop === selectedTroop);
+    });
+  });
+});
+
+const uidInput = document.getElementById("f_uid");
+const uidCounter = document.getElementById("uidCounter");
+uidInput.addEventListener("input", ()=>{
+  uidInput.value = uidInput.value.replace(/[^0-9]/g,"").slice(0,16);
+  uidCounter.textContent = uidInput.value.length + "/16";
+  uidInput.classList.remove("invalid");
+  document.getElementById("uidErr").classList.remove("show");
+});
+
+const powerInput = document.getElementById("f_power");
+powerInput.addEventListener("input", ()=>{
+  powerInput.value = powerInput.value.replace(/[^0-9.]/g,"");
+});
+
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
+}
+
+async function loadApplications(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value){ return JSON.parse(res.value); }
+    return [];
+  }catch(e){ return []; }
+}
+async function saveApplications(list){
+  await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
+}
+
+document.getElementById("submitBtn").addEventListener("click", async ()=>{
+  const nickname = document.getElementById("f_nickname").value.trim();
+  const server = document.getElementById("f_server").value.trim();
+  const uid = uidInput.value.trim();
+  const power = powerInput.value.trim();
+
+  let valid = true;
+  if(uid.length !== 16){
+    uidInput.classList.add("invalid");
+    document.getElementById("uidErr").classList.add("show");
+    valid = false;
+  }
+  if(!nickname || !server){ valid = false; }
+  if(!valid){ showToast(t("requiredError")); return; }
+
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
+    nickname, server, uid,
+    troop: selectedTroop || "",
+    power: power || "",
+    submittedAt: new Date().toISOString(),
+    lang: currentLang
+  };
+
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = "...";
+
+  try{
+    const list = await loadApplications();
+    list.push(entry);
+    await saveApplications(list);
+
+    const box = document.getElementById("summaryBox");
+    box.innerHTML = "";
+    const rows = [
+      [t("nickname"), entry.nickname],
+      [t("currentServer"), entry.server],
+      [t("uidLabel"), entry.uid],
+      [t("troopType"), entry.troop ? t(entry.troop) : t("notSet")],
+      [t("power"), entry.power || t("notSet")]
+    ];
+    rows.forEach(([label,val])=>{
+      const d = document.createElement("div");
+      const s1 = document.createElement("span"); s1.textContent = label;
+      const s2 = document.createElement("span"); s2.textContent = val;
+      d.appendChild(s1); d.appendChild(s2);
+      box.appendChild(d);
+    });
+
+    document.getElementById("formView").style.display = "none";
+    document.getElementById("successView").style.display = "block";
+    showToast(t("submitted"));
+  }catch(e){
+    showToast("Error: " + e.message);
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+});
+
+document.getElementById("newAppBtn").addEventListener("click", ()=>{
+  document.getElementById("f_nickname").value = "";
+  document.getElementById("f_server").value = "";
+  uidInput.value = "";
+  uidCounter.textContent = "0/16";
+  powerInput.value = "";
+  selectedTroop = null;
+  document.querySelectorAll(".troop-btn").forEach(b=>b.classList.remove("selected"));
+  document.getElementById("successView").style.display = "none";
+  document.getElementById("formView").style.display = "block";
+});
+
+const adminToggle = document.getElementById("adminToggle");
+const adminPanelEl = document.getElementById("adminPanel");
+let adminOpen = false;
+
+adminToggle.addEventListener("click", ()=>{
+  adminOpen = !adminOpen;
+  adminPanelEl.style.display = adminOpen ? "block" : "none";
+});
+
+document.getElementById("adminEnterBtn").addEventListener("click", async ()=>{
+  const pw = document.getElementById("adminPw").value;
+  if(pw === ADMIN_PASSWORD){
+    adminAuthed = true;
+    document.getElementById("lockIcon").textContent = t("adminUnlocked");
+    document.getElementById("adminErr").classList.remove("show");
+    document.getElementById("adminLoginView").style.display = "none";
+    document.getElementById("adminDataView").style.display = "block";
+    await renderAdminList();
+  } else {
+    document.getElementById("adminErr").classList.add("show");
+  }
+});
+document.getElementById("adminPw").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") document.getElementById("adminEnterBtn").click();
+});
+document.getElementById("closeAdminBtn").addEventListener("click", ()=>{
+  adminAuthed = false;
+  document.getElementById("lockIcon").textContent = t("adminLocked");
+  document.getElementById("adminPw").value = "";
+  document.getElementById("adminDataView").style.display = "none";
+  document.getElementById("adminLoginView").style.display = "block";
+  adminOpen = false;
+  adminPanelEl.style.display = "none";
+});
+
+function fmtTime(iso){
+  try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; }
+}
+
+async function renderAdminList(){
+  const list = await loadApplications();
+  const container = document.getElementById("adminList");
+  if(!list.length){
+    container.innerHTML = '<div class="empty-state"></div>';
+    container.querySelector(".empty-state").textContent = t("adminEmpty");
+    return;
+  }
+  list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  const wrap = document.createElement("div");
+  wrap.className = "table-wrap";
+  const tbl = document.createElement("table");
+  tbl.innerHTML = `<thead><tr>
+    <th>${t("colNickname")}</th><th>${t("colServer")}</th><th>${t("colUid")}</th>
+    <th>${t("colTroop")}</th><th>${t("colPower")}</th><th>${t("colTime")}</th><th></th>
+  </tr></thead>`;
+  const tbody = document.createElement("tbody");
+  list.forEach(entry=>{
+    const tr = document.createElement("tr");
+    const troopLabel = entry.troop ? t(entry.troop) : t("notSet");
+    tr.innerHTML = `
+      <td>${escapeHtml(entry.nickname)}</td>
+      <td>${escapeHtml(entry.server)}</td>
+      <td>${escapeHtml(entry.uid)}</td>
+      <td>${escapeHtml(troopLabel)}</td>
+      <td>${escapeHtml(entry.power || t("notSet"))}</td>
+      <td>${fmtTime(entry.submittedAt)}</td>
+      <td><button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  wrap.appendChild(tbl);
+  container.innerHTML = "";
+  container.appendChild(wrap);
+
+  container.querySelectorAll(".del-btn").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      if(!confirm(t("deleteConfirm"))) return;
+      const id = btn.dataset.id;
+      const current = await loadApplications();
+      await saveApplications(current.filter(e=>e.id !== id));
+      showToast(t("deleted"));
+      await renderAdminList();
+    });
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
+
+document.getElementById("copyCsvBtn").addEventListener("click", async ()=>{
+  const list = await loadApplications();
+  list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
+  const header = ["nickname","server","uid","troop","power","submittedAt"];
+  const lines = [header.join(",")];
+  list.forEach(e=>{
+    const row = [e.nickname, e.server, e.uid, e.troop, e.power, e.submittedAt]
+      .map(v => '"' + String(v||"").replace(/"/g,'""') + '"');
+    lines.push(row.join(","));
+  });
+  const csv = lines.join("\\n");
+  try{
+    await navigator.clipboard.writeText(csv);
+    showToast(t("adminCopied"));
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = csv;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast(t("adminCopied"));
+  }
+});
+
+applyLang();
+</script>
+</body>
+</html>
