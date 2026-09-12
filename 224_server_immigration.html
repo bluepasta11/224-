@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>224 Server Immigration</title>
+<style>
+  :root{
+    --bg:#0b0e14;
+    --bg-elev:#11151f;
+    --card:#131826;
+    --border:#232a3d;
+    --border-glow:#3a5bd9;
+    --blue:#3b6cf0;
+    --blue-light:#5b8dff;
+    --text:#e9ecf5;
+    --text-dim:#8b93a8;
+    --text-faint:#565f78;
+    --green:#3ddc84;
+    --red-bg:#2a1518;
+    --red-border:#5c2530;
+    --red-text:#e78a94;
+    --gold:#d9a441;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at top, #131a2c 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Pretendard","Noto Sans KR","Noto Sans JP","Noto Sans SC",sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+
+  /* language tabs */
+  .langbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px;}
+  .langbtn{
+    flex:1;min-width:70px;
+    padding:11px 10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--bg-elev);
+    color:var(--text-dim);
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .langbtn.active{
+    border-color:var(--blue);
+    background:rgba(59,108,240,0.12);
+    color:var(--blue-light);
+  }
+  .langbtn:hover:not(.active){border-color:#39435c;color:var(--text);}
+
+  /* hero */
+  .hero{text-align:center;margin-bottom:40px;}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 18px;
+    border:1px solid rgba(61,220,132,0.35);
+    border-radius:999px;
+    color:var(--green);
+    font-size:13px;font-weight:600;
+    margin-bottom:22px;
+  }
+  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  h1.title{
+    font-size:44px;
+    line-height:1.15;
+    font-weight:800;
+    margin:0 0 14px;
+    background:linear-gradient(180deg,#ffffff 0%,#b9c4e6 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{font-size:16px;color:var(--text-dim);margin:0 0 18px;}
+  .designed{font-size:13px;color:var(--text-faint);}
+  .designed b{color:var(--gold);font-weight:600;}
+
+  .divider{height:1px;background:var(--border);margin:34px 0;}
+
+  /* card */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 0 0 1px rgba(59,108,240,0.06), 0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+  .card + .card{margin-top:20px;}
+  .section-head{
+    display:flex;align-items:center;gap:12px;
+    margin-bottom:24px;
+  }
+  .section-num{color:var(--blue-light);font-weight:800;font-size:15px;letter-spacing:0.02em;}
+  .section-label{font-size:16px;font-weight:700;color:var(--text);}
+  .section-rule{flex:1;height:1px;background:var(--border);}
+
+  label.field-label{
+    display:block;font-size:13px;color:var(--text-dim);margin-bottom:8px;font-weight:600;
+  }
+  label.field-label .req{color:var(--blue-light);margin-left:2px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:480px){.row2{grid-template-columns:1fr;}}
+
+  input[type=text], input[type=number]{
+    width:100%;
+    background:var(--bg-elev);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:13px 14px;
+    color:var(--text);
+    font-size:15px;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input::placeholder{color:var(--text-faint);}
+  input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,108,240,0.15);}
+  input.invalid{border-color:#c5495a;}
+
+  .field{margin-bottom:20px;}
+  .uid-wrap{position:relative;}
+  .uid-counter{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    font-size:12px;color:var(--text-faint);pointer-events:none;
+  }
+
+  .warnbox{
+    background:var(--red-bg);
+    border:1px solid var(--red-border);
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--red-text);
+    margin-bottom:22px;
+  }
+
+  .opt-tag{
+    display:inline-block;font-size:11px;color:var(--text-faint);
+    border:1px solid var(--border);border-radius:6px;padding:2px 7px;margin-left:8px;font-weight:600;
+  }
+
+  .troop-group{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .troop-btn{
+    background:var(--bg-elev);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 8px;
+    color:var(--text-dim);
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+    text-align:center;
+    transition:all .15s;
+  }
+  .troop-btn.selected{
+    border-color:var(--blue);
+    background:rgba(59,108,240,0.14);
+    color:var(--blue-light);
+  }
+  .troop-btn:hover:not(.selected){border-color:#39435c;color:var(--text);}
+
+  .errmsg{color:#e78a94;font-size:12px;margin-top:7px;display:none;}
+  .errmsg.show{display:block;}
+
+  .submit-btn{
+    width:100%;
+    margin-top:6px;
+    background:linear-gradient(180deg,var(--blue-light) 0%,var(--blue) 100%);
+    border:none;border-radius:12px;
+    padding:16px;
+    color:#fff;font-size:16px;font-weight:700;
+    cursor:pointer;
+    transition:filter .15s, transform .1s;
+  }
+  .submit-btn:hover{filter:brightness(1.08);}
+  .submit-btn:active{transform:scale(0.99);}
+
+  /* success view */
+  .success{text-align:center;padding:10px 0;}
+  .success .check{
+    width:60px;height:60px;border-radius:50%;
+    background:rgba(61,220,132,0.12);border:1px solid rgba(61,220,132,0.35);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 20px;font-size:28px;color:var(--green);
+  }
+  .success h3{font-size:20px;margin:0 0 8px;}
+  .success p{color:var(--text-dim);font-size:14px;margin:0 0 24px;}
+  .summary{
+    text-align:left;background:var(--bg-elev);border:1px solid var(--border);
+    border-radius:12px;padding:16px 18px;margin-bottom:22px;font-size:14px;
+  }
+  .summary div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
+  .summary div:last-child{border-bottom:none;}
+  .summary span:first-child{color:var(--text-dim);}
+  .summary span:last-child{color:var(--text);font-weight:600;}
+  .ghost-btn{
+    width:100%;background:transparent;border:1px solid var(--border);border-radius:12px;
+    padding:13px;color:var(--text-dim);font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:#39435c;color:var(--text);}
+
+  /* admin */
+  .admin-card{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 22px;cursor:pointer;
+  }
+  .admin-left{display:flex;align-items:center;gap:12px;color:var(--text-dim);font-size:14px;font-weight:600;}
+  .lock-icon{font-size:16px;}
+  .admin-panel{padding:22px 22px 26px;}
+  .admin-login{display:flex;gap:10px;}
+  .admin-login input{flex:1;}
+  .admin-login button{
+    background:var(--blue);border:none;border-radius:10px;padding:0 18px;
+    color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .admin-header h3{font-size:16px;margin:0;}
+  .admin-actions{display:flex;gap:8px;}
+  .small-btn{
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;
+    padding:7px 12px;color:var(--text-dim);font-size:12px;font-weight:600;cursor:pointer;
+  }
+  .small-btn:hover{color:var(--text);border-color:#39435c;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;}
+  th{
+    text-align:left;color:var(--text-faint);font-weight:600;
+    padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;
+  }
+  td{padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  .del-btn{
+    background:none;border:1px solid var(--red-border);color:var(--red-text);
+    border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer;
+  }
+  .del-btn:hover{background:rgba(197,73,90,0.12);}
+  .empty-state{text-align:center;color:var(--text-faint);padding:30px 0;font-size:13px;}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1a2030;border:1px solid var(--border);color:var(--text);
+    padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;
+  }
+  .toast.show{opacity:1;}
+  .privacy-note{font-size:11px;color:var(--text-faint);text-align:center;margin-top:18px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="langbar">
+    <button class="langbtn active" data-lang="ko">한국어</button>
+    <button class="langbtn" data-lang="en">English</button>
+    <button class="langbtn" data-lang="ja">日本語</button>
+    <button class="langbtn" data-lang="zh">中文</button>
+  </div>
+
+  <div class="hero">
+    <div class="badge"><span class="dot"></span><span data-i="badge"></span></div>
+    <h1 class="title" data-i="title"></h1>
+    <p class="subtitle" data-i="subtitle"></p>
+    <p class="designed"><span data-i="designedByPrefix"></span> <b>곰사탕(Gomsatang)</b></p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FORM CARD -->
+  <div class="card" id="formCard">
+    <div id="formView">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <span class="section-label" data-i="sectionPlayer"></span>
+        <span class="section-rule"></span>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label"><span data-i="nickname"></span><span class="req">*</span></label>
+          <input type="text" id="f_nickname" data-i-ph="nicknamePh" maxlength="40" />
+        </div>
+        <div class="field">
+          <label class="field-label"><span data-i="currentServer"></span><span class="req">*</span></label>
+          <input type="text" id="f_server" data-i-ph="currentServerPh" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><span data-i="uidLabel"></span><span class="req">*</span></label>
+        <div class="uid-wrap">
+          <input type="text" id="f_uid" inputmode="numeric" data-i-ph="uidPh" maxlength="16" />
+          <span class="uid-counter" id="uidCounter">0/16</span>
+        </div>
+        <div class="errmsg" id="uidErr" data-i="uidError"></div>
+      </div>
+
+      <div class="warnbox" data-i="uidWarning"></div>
+
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <span class="section-label" data-i="sectionOptional"></span>
+        <span class="section-rule"></span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" data-i="troopType"></label>
+        <div class="troop-group">
+          <button type="button" class="troop-btn" data-troop="fighter" data-i="fighter"></button>
+          <button type="button" class="troop-btn" data-troop="shooter" data-i="shooter"></button>
+          <button type="button" class="troop-btn" data-troop="rider" data-i="rider"></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" data-i="power"></label>
+        <input type="text" id="f_power" inputmode="numeric" data-i-ph="powerPh" maxlength="20" />
+      </div>
+
+      <button class="submit-btn" id="submitBtn" data-i="submit"></button>
+    </div>
+
+    <div id="successView" style="display:none;">
+      <div class="success">
+        <div class="check">✓</div>
+        <h3 data-i="successTitle"></h3>
+        <p data-i="successDesc"></p>
+        <div class="summary" id="summaryBox"></div>
+        <button class="ghost-btn" id="newAppBtn" data-i="newApp"></button>
+      </div>
+    </div>
+  </div>
+
+  <p class="privacy-note" data-i="privacyNote"></p>
+
+  <div class="divider"></div>
+
+  <!-- ADMIN CARD -->
+  <div class="card" style="padding:0;">
+    <div class="admin-card" id="adminToggle">
+      <div class="admin-left">
+        <span>🛡️</span>
+        <span data-i="adminPanel"></span>
+      </div>
+      <span class="lock-icon" id="lockIcon">🔒</span>
+    </div>
+    <div class="admin-panel" id="adminPanel" style="display:none;">
+      <div id="adminLoginView">
+        <div class="admin-login">
+          <input type="text" id="adminPw" data-i-ph="adminPasswordPh" autocomplete="off" />
+          <button id="adminEnterBtn" data-i="adminEnter"></button>
+        </div>
+        <div class="errmsg" id="adminErr" data-i="adminWrong"></div>
+      </div>
+      <div id="adminDataView" style="display:none;">
+        <div class="admin-header">
+          <h3 data-i="adminTitle"></h3>
+          <div class="admin-actions">
+            <button class="small-btn" id="copyCsvBtn" data-i="adminCopy"></button>
+            <button class="small-btn" id="closeAdminBtn" data-i="adminClose"></button>
+          </div>
+        </div>
+        <div id="adminList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "applications_224";
+// Set your own admin password here.
+const ADMIN_PASSWORD = "224admin";
+
+const I18N = {
+  ko: {
+    badge: "LIVE · 이민 신청 접수 중",
+    title: "224 서버 이민 신청",
+    subtitle: "다른 서버 → 224서버 합류",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "플레이어 정보",
+    sectionOptional: "추가 정보 (선택)",
+    nickname: "닉네임",
+    nicknamePh: "게임 내 닉네임",
+    currentServer: "현재 서버 번호",
+    currentServerPh: "예: 111",
+    uidLabel: "UID (16자리)",
+    uidPh: "숫자 16자리 입력",
+    uidError: "UID는 숫자 16자리로 입력해주세요.",
+    uidWarning: "⚠ UID는 게임 내 프로필에서 정확히 확인 후 입력해주세요. 잘못된 UID 입력 시 이민 처리가 불가할 수 있습니다.",
+    troopType: "1군 병종",
+    fighter: "파이터",
+    shooter: "슈터",
+    rider: "라이더",
+    power: "1군 전투력",
+    powerPh: "예: 1.2억",
+    submit: "확인 후 신청서 작성하기 →",
+    requiredError: "필수 항목(닉네임, 현재 서버, UID 16자리)을 모두 입력해주세요.",
+    successTitle: "신청이 완료되었습니다!",
+    successDesc: "운영진 확인 후 안내드리겠습니다.",
+    newApp: "새 신청서 작성",
+    privacyNote: "제출된 정보는 224서버 운영진에게 전달되며 이민 심사 목적으로만 사용됩니다.",
+    adminPanel: "운영진 관리 패널",
+    adminPasswordPh: "관리자 비밀번호",
+    adminEnter: "입장",
+    adminWrong: "비밀번호가 올바르지 않습니다.",
+    adminTitle: "신청 목록 관리",
+    adminEmpty: "아직 접수된 신청이 없습니다.",
+    adminDelete: "삭제",
+    adminCopy: "CSV 복사",
+    adminCopied: "클립보드에 복사되었습니다.",
+    adminClose: "닫기",
+    colNickname: "닉네임", colServer: "서버", colUid: "UID", colTroop: "병종", colPower: "전투력", colTime: "접수시각",
+    notSet: "-", deleteConfirm: "이 신청서를 삭제할까요?", deleted: "삭제되었습니다.",
+    submitted: "신청서가 접수되었습니다."
+  },
+  en: {
+    badge: "LIVE · Immigration Open",
+    title: "224 Server Immigration",
+    subtitle: "Other Server → Join 224 Server",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "Player Info",
+    sectionOptional: "Additional Info (Optional)",
+    nickname: "Nickname",
+    nicknamePh: "In-game nickname",
+    currentServer: "Current Server No.",
+    currentServerPh: "e.g. 111",
+    uidLabel: "UID (16 digits)",
+    uidPh: "Enter 16 digit number",
+    uidError: "UID must be exactly 16 digits.",
+    uidWarning: "⚠ Please double-check your UID in your in-game profile before entering it. An incorrect UID may prevent your transfer from being processed.",
+    troopType: "Primary Troop Type",
+    fighter: "Fighter",
+    shooter: "Shooter",
+    rider: "Rider",
+    power: "Primary Power",
+    powerPh: "e.g. 120M",
+    submit: "Confirm & Submit Application →",
+    requiredError: "Please fill in all required fields (Nickname, Current Server, 16-digit UID).",
+    successTitle: "Application submitted!",
+    successDesc: "Our staff will review it and get back to you.",
+    newApp: "Submit another application",
+    privacyNote: "Submitted information is shared with the 224 Server staff and used only for immigration review.",
+    adminPanel: "Staff Admin Panel",
+    adminPasswordPh: "Admin password",
+    adminEnter: "Enter",
+    adminWrong: "Incorrect password.",
+    adminTitle: "Manage Applications",
+    adminEmpty: "No applications yet.",
+    adminDelete: "Delete",
+    adminCopy: "Copy CSV",
+    adminCopied: "Copied to clipboard.",
+    adminClose: "Close",
+    colNickname: "Nickname", colServer: "Server", colUid: "UID", colTroop: "Troop", colPower: "Power", colTime: "Submitted",
+    notSet: "-", deleteConfirm: "Delete this application?", deleted: "Deleted.",
+    submitted: "Application submitted."
+  },
+  ja: {
+    badge: "LIVE · 移民申請 受付中",
+    title: "224サーバー移民申請",
+    subtitle: "他サーバー → 224サーバーへ合流",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "プレイヤー情報",
+    sectionOptional: "追加情報（任意）",
+    nickname: "ニックネーム",
+    nicknamePh: "ゲーム内ニックネーム",
+    currentServer: "現在のサーバー番号",
+    currentServerPh: "例：111",
+    uidLabel: "UID（16桁）",
+    uidPh: "16桁の数字を入力",
+    uidError: "UIDは16桁の数字で入力してください。",
+    uidWarning: "⚠ UIDはゲーム内プロフィールで正確に確認してから入力してください。誤ったUIDを入力すると移民処理ができない場合があります。",
+    troopType: "主力兵種",
+    fighter: "ファイター",
+    shooter: "シューター",
+    rider: "ライダー",
+    power: "主力戦力",
+    powerPh: "例：1.2億",
+    submit: "確認して申請する →",
+    requiredError: "必須項目（ニックネーム、現在のサーバー、UID16桁）をすべて入力してください。",
+    successTitle: "申請が完了しました！",
+    successDesc: "運営スタッフが確認後、ご案内いたします。",
+    newApp: "新しい申請書を作成",
+    privacyNote: "送信された情報は224サーバー運営スタッフに共有され、移民審査のみに使用されます。",
+    adminPanel: "運営管理パネル",
+    adminPasswordPh: "管理者パスワード",
+    adminEnter: "入場",
+    adminWrong: "パスワードが正しくありません。",
+    adminTitle: "申請リスト管理",
+    adminEmpty: "まだ申請がありません。",
+    adminDelete: "削除",
+    adminCopy: "CSVをコピー",
+    adminCopied: "クリップボードにコピーしました。",
+    adminClose: "閉じる",
+    colNickname: "ニックネーム", colServer: "サーバー", colUid: "UID", colTroop: "兵種", colPower: "戦力", colTime: "受付時刻",
+    notSet: "-", deleteConfirm: "この申請を削除しますか？", deleted: "削除しました。",
+    submitted: "申請が送信されました。"
+  },
+  zh: {
+    badge: "LIVE · 移民申请开放中",
+    title: "224服 移民申请",
+    subtitle: "其他服 → 加入224服",
+    designedByPrefix: "Designed by",
+    sectionPlayer: "玩家信息",
+    sectionOptional: "附加信息（可选）",
+    nickname: "昵称",
+    nicknamePh: "游戏内昵称",
+    currentServer: "当前服务器编号",
+    currentServerPh: "例：111",
+    uidLabel: "UID（16位）",
+    uidPh: "请输入16位数字",
+    uidError: "UID必须为16位数字。",
+    uidWarning: "⚠ 请在游戏内个人资料中仔细核对UID后再填写。UID填写错误可能导致无法完成迁服处理。",
+    troopType: "主力兵种",
+    fighter: "战士",
+    shooter: "射手",
+    rider: "骑兵",
+    power: "主力战力",
+    powerPh: "例：1.2亿",
+    submit: "确认并提交申请 →",
+    requiredError: "请填写所有必填项（昵称、当前服务器、16位UID）。",
+    successTitle: "申请提交成功！",
+    successDesc: "管理团队审核后会与您联系。",
+    newApp: "提交新的申请",
+    privacyNote: "提交的信息将发送给224服管理团队，仅用于迁服审核。",
+    adminPanel: "管理员面板",
+    adminPasswordPh: "管理员密码",
+    adminEnter: "进入",
+    adminWrong: "密码不正确。",
+    adminTitle: "申请列表管理",
+    adminEmpty: "暂无申请。",
+    adminDelete: "删除",
+    adminCopy: "复制CSV",
+    adminCopied: "已复制到剪贴板。",
+    adminClose: "关闭",
+    colNickname: "昵称", colServer: "服务器", colUid: "UID", colTroop: "兵种", colPower: "战力", colTime: "提交时间",
+    notSet: "-", deleteConfirm: "确定要删除此申请吗？", deleted: "已删除。",
+    submitted: "申请已提交。"
+  }
+};
+
+let currentLang = "ko";
+let selectedTroop = null;
+
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.ko[key] || key; }
+
+function applyLang(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll("[data-i]").forEach(el=>{
+    const key = el.getAttribute("data-i");
+    el.textContent = t(key);
+  });
+  document.querySelectorAll("[data-i-ph]").forEach(el=>{
+    el.placeholder = t(el.getAttribute("data-i-ph"));
+  });
+  document.querySelectorAll(".langbtn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang === currentLang);
+  });
+}
+
+document.querySelectorAll(".langbtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    currentLang = btn.dataset.lang;
+    applyLang();
+  });
+});
+
+// troop selection
+document.querySelectorAll(".troop-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const val = btn.dataset.troop;
+    if(selectedTroop === val){
+      selectedTroop = null;
+    } else {
+      selectedTroop = val;
+    }
+    document.querySelectorAll(".troop-btn").forEach(b=>{
+      b.classList.toggle("selected", b.dataset.troop === selectedTroop);
+    });
+  });
+});
+
+// UID counter + numeric filter
+const uidInput = document.getElementById("f_uid");
+const uidCounter = document.getElementById("uidCounter");
+uidInput.addEventListener("input", ()=>{
+  uidInput.value = uidInput.value.replace(/[^0-9]/g,"").slice(0,16);
+  uidCounter.textContent = uidInput.value.length + "/16";
+  uidInput.classList.remove("invalid");
+  document.getElementById("uidErr").classList.remove("show");
+});
+
+const powerInput = document.getElementById("f_power");
+powerInput.addEventListener("input", ()=>{
+  powerInput.value = powerInput.value.replace(/[^0-9.]/g,"");
+});
+
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
+}
+
+async function loadApplications(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value){
+      return JSON.parse(res.value);
+    }
+    return [];
+  }catch(e){
+    return [];
+  }
+}
+
+async function saveApplications(list){
+  await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
+}
+
+document.getElementById("submitBtn").addEventListener("click", async ()=>{
+  const nickname = document.getElementById("f_nickname").value.trim();
+  const server = document.getElementById("f_server").value.trim();
+  const uid = uidInput.value.trim();
+  const power = powerInput.value.trim();
+
+  let valid = true;
+  if(uid.length !== 16){
+    uidInput.classList.add("invalid");
+    document.getElementById("uidErr").classList.add("show");
+    valid = false;
+  }
+  if(!nickname || !server){
+    valid = false;
+  }
+  if(!valid){
+    showToast(t("requiredError"));
+    return;
+  }
+
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
+    nickname, server, uid,
+    troop: selectedTroop || "",
+    power: power || "",
+    submittedAt: new Date().toISOString(),
+    lang: currentLang
+  };
+
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = "...";
+
+  try{
+    const list = await loadApplications();
+    list.push(entry);
+    await saveApplications(list);
+
+    // build summary
+    const box = document.getElementById("summaryBox");
+    box.innerHTML = "";
+    const rows = [
+      [t("nickname"), entry.nickname],
+      [t("currentServer"), entry.server],
+      [t("uidLabel"), entry.uid],
+      [t("troopType"), entry.troop ? t(entry.troop) : t("notSet")],
+      [t("power"), entry.power || t("notSet")]
+    ];
+    rows.forEach(([label,val])=>{
+      const d = document.createElement("div");
+      const s1 = document.createElement("span"); s1.textContent = label;
+      const s2 = document.createElement("span"); s2.textContent = val;
+      d.appendChild(s1); d.appendChild(s2);
+      box.appendChild(d);
+    });
+
+    document.getElementById("formView").style.display = "none";
+    document.getElementById("successView").style.display = "block";
+    showToast(t("submitted"));
+  }catch(e){
+    showToast("Error: " + e.message);
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+});
+
+document.getElementById("newAppBtn").addEventListener("click", ()=>{
+  document.getElementById("f_nickname").value = "";
+  document.getElementById("f_server").value = "";
+  uidInput.value = "";
+  uidCounter.textContent = "0/16";
+  powerInput.value = "";
+  selectedTroop = null;
+  document.querySelectorAll(".troop-btn").forEach(b=>b.classList.remove("selected"));
+  document.getElementById("successView").style.display = "none";
+  document.getElementById("formView").style.display = "block";
+});
+
+// ---- Admin ----
+const adminToggle = document.getElementById("adminToggle");
+const adminPanelEl = document.getElementById("adminPanel");
+let adminOpen = false;
+let adminAuthed = false;
+
+adminToggle.addEventListener("click", ()=>{
+  adminOpen = !adminOpen;
+  adminPanelEl.style.display = adminOpen ? "block" : "none";
+  document.getElementById("lockIcon").textContent = adminOpen ? "🔓" : "🔒";
+});
+
+document.getElementById("adminEnterBtn").addEventListener("click", async ()=>{
+  const pw = document.getElementById("adminPw").value;
+  if(pw === ADMIN_PASSWORD){
+    adminAuthed = true;
+    document.getElementById("adminErr").classList.remove("show");
+    document.getElementById("adminLoginView").style.display = "none";
+    document.getElementById("adminDataView").style.display = "block";
+    await renderAdminList();
+  } else {
+    document.getElementById("adminErr").classList.add("show");
+  }
+});
+
+document.getElementById("adminPw").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") document.getElementById("adminEnterBtn").click();
+});
+
+document.getElementById("closeAdminBtn").addEventListener("click", ()=>{
+  adminAuthed = false;
+  document.getElementById("adminPw").value = "";
+  document.getElementById("adminDataView").style.display = "none";
+  document.getElementById("adminLoginView").style.display = "block";
+  adminOpen = false;
+  adminPanelEl.style.display = "none";
+  document.getElementById("lockIcon").textContent = "🔒";
+});
+
+function fmtTime(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString();
+  }catch(e){ return iso; }
+}
+
+async function renderAdminList(){
+  const list = await loadApplications();
+  const container = document.getElementById("adminList");
+  if(!list.length){
+    container.innerHTML = '<div class="empty-state"></div>';
+    container.querySelector(".empty-state").textContent = t("adminEmpty");
+    return;
+  }
+  list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  const table = document.createElement("div");
+  table.className = "table-wrap";
+  const tbl = document.createElement("table");
+  tbl.innerHTML = `<thead><tr>
+    <th>${t("colNickname")}</th>
+    <th>${t("colServer")}</th>
+    <th>${t("colUid")}</th>
+    <th>${t("colTroop")}</th>
+    <th>${t("colPower")}</th>
+    <th>${t("colTime")}</th>
+    <th></th>
+  </tr></thead>`;
+  const tbody = document.createElement("tbody");
+  list.forEach(entry=>{
+    const tr = document.createElement("tr");
+    const troopLabel = entry.troop ? t(entry.troop) : t("notSet");
+    tr.innerHTML = `
+      <td>${escapeHtml(entry.nickname)}</td>
+      <td>${escapeHtml(entry.server)}</td>
+      <td>${escapeHtml(entry.uid)}</td>
+      <td>${escapeHtml(troopLabel)}</td>
+      <td>${escapeHtml(entry.power || t("notSet"))}</td>
+      <td>${fmtTime(entry.submittedAt)}</td>
+      <td><button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  table.appendChild(tbl);
+  container.innerHTML = "";
+  container.appendChild(table);
+
+  container.querySelectorAll(".del-btn").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      if(!confirm(t("deleteConfirm"))) return;
+      const id = btn.dataset.id;
+      const current = await loadApplications();
+      const updated = current.filter(e=>e.id !== id);
+      await saveApplications(updated);
+      showToast(t("deleted"));
+      await renderAdminList();
+    });
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
+
+document.getElementById("copyCsvBtn").addEventListener("click", async ()=>{
+  const list = await loadApplications();
+  list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
+  const header = ["nickname","server","uid","troop","power","submittedAt"];
+  const lines = [header.join(",")];
+  list.forEach(e=>{
+    const row = [e.nickname, e.server, e.uid, e.troop, e.power, e.submittedAt]
+      .map(v => '"' + String(v||"").replace(/"/g,'""') + '"');
+    lines.push(row.join(","));
+  });
+  const csv = lines.join("\\n");
+  try{
+    await navigator.clipboard.writeText(csv);
+    showToast(t("adminCopied"));
+  }catch(e){
+    // fallback: select a temp textarea
+    const ta = document.createElement("textarea");
+    ta.value = csv;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast(t("adminCopied"));
+  }
+});
+
+applyLang();
+</script>
+</body>
+</html>
