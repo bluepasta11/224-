@@ -181,6 +181,9 @@
   }
 
   .troop-group{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .alliance-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;}
+  .alliance-btn{padding:11px 6px;}
+  .app-alliance-tag{font-size:9.5px;color:#3ec6ea;border:1px solid #245a68;padding:1px 5px;white-space:nowrap;flex-shrink:0;}
   .troop-btn{
     background:var(--bg2);border:1px solid var(--line);
     padding:14px 6px 12px;color:var(--text-dim);
@@ -311,37 +314,55 @@
   .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
 
+  /* stats panel */
+  .stats-panel{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #14201a;}
+  .stats-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .stat-chip{background:#101410;border:1px solid #1c2621;padding:9px 14px;min-width:96px;flex:1;}
+  .stat-chip .num{font-size:19px;font-weight:700;color:var(--console);line-height:1.2;}
+  .stat-chip .lbl{font-size:9.5px;color:var(--console-dim);margin-top:2px;letter-spacing:0.02em;}
+  .stat-chip.warn .num{color:#e79a92;}
+  .stat-chip.ok .num{color:var(--console);}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;}
+  @media (max-width:420px){.stats-grid{grid-template-columns:1fr;}}
+  .stats-block-title{font-size:11px;color:var(--console-dim);margin-bottom:8px;letter-spacing:0.03em;}
+  .stat-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:7px;}
+  .stat-bar-label{width:64px;flex-shrink:0;color:#cfe9da;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .stat-bar-track{flex:1;height:7px;background:#151b16;position:relative;}
+  .stat-bar-fill{height:100%;}
+  .stat-bar-count{width:28px;text-align:right;flex-shrink:0;color:var(--console-dim);}
+
   /* score tiers */
   .tier-s{background:var(--tier-elite);box-shadow:0 0 6px rgba(255,157,66,0.6);}
   .tier-a{background:var(--tier-high);box-shadow:0 0 6px rgba(197,131,232,0.5);}
   .tier-b{background:var(--tier-mid);box-shadow:0 0 6px rgba(62,198,234,0.5);}
   .tier-c{background:var(--tier-low);}
 
-  .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;}
+  .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;}
   .app-card{
-    background:#101410;border:1px solid #1c2621;border-left:4px solid #1c2621;padding:16px 16px 14px;
+    background:#101410;border:1px solid #1c2621;border-left:3px solid #1c2621;padding:10px 12px;
   }
   .app-card.tier-s-card{border-left-color:var(--tier-elite);}
   .app-card.tier-a-card{border-left-color:var(--tier-high);}
   .app-card.tier-b-card{border-left-color:var(--tier-mid);}
   .app-card.tier-c-card{border-left-color:var(--tier-low);}
-  .app-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
-  .app-nickname{font-size:16px;font-weight:700;color:#eafff2;word-break:break-all;}
-  .app-server-tag{font-size:10.5px;color:var(--console-dim);border:1px solid var(--console-dim);padding:2px 7px;white-space:nowrap;margin-top:2px;display:inline-block;}
+  .app-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .app-name-wrap{display:flex;align-items:baseline;gap:6px;min-width:0;}
+  .app-nickname{font-size:13.5px;font-weight:700;color:#eafff2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .app-server-tag{font-size:9.5px;color:var(--console-dim);border:1px solid var(--console-dim);padding:1px 5px;white-space:nowrap;flex-shrink:0;}
   .app-score-badge{
-    flex-shrink:0;text-align:center;padding:6px 12px;font-weight:700;font-size:15px;
+    flex-shrink:0;text-align:center;padding:2px 9px;font-weight:700;font-size:12.5px;
     border:1px solid; border-radius:2px;
   }
   .app-score-badge.tier-s{color:var(--tier-elite);background:rgba(255,157,66,0.12);border-color:var(--tier-elite);box-shadow:none;}
   .app-score-badge.tier-a{color:var(--tier-high);background:rgba(197,131,232,0.12);border-color:var(--tier-high);box-shadow:none;}
   .app-score-badge.tier-b{color:var(--tier-mid);background:rgba(62,198,234,0.12);border-color:var(--tier-mid);box-shadow:none;}
   .app-score-badge.tier-c{color:var(--tier-low);background:rgba(255,255,255,0.03);border-color:#3a4248;box-shadow:none;}
-  .app-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px solid #14201a;color:#cfe9da;}
-  .app-row:last-of-type{border-bottom:none;}
-  .app-row span:first-child{color:var(--console-dim);}
-  .app-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #14201a;}
-  .app-time{font-size:10.5px;color:var(--console-dim);}
-  .del-btn{background:none;border:1px solid rgba(226,86,74,0.5);color:#e79a92;padding:4px 10px;font-size:10.5px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
+  .app-meta{font-size:10.5px;color:var(--console-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;}
+  .app-meta b{color:#cfe9da;font-weight:600;}
+  .app-meta .sep{margin:0 5px;opacity:0.5;}
+  .app-card-foot{display:flex;justify-content:space-between;align-items:center;}
+  .app-time{font-size:9.5px;color:var(--console-dim);}
+  .del-btn{background:none;border:1px solid rgba(226,86,74,0.5);color:#e79a92;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
   .del-btn:hover{background:rgba(226,86,74,0.12);}
   .empty-state{text-align:center;color:var(--console-dim);padding:40px 0;font-size:13px;}
 
@@ -451,6 +472,17 @@
       </div>
 
       <div class="field">
+        <label class="field-label" data-i="allianceLabel"></label>
+        <div class="alliance-group">
+          <button type="button" class="troop-btn alliance-btn" data-alliance="z3ro">Z3RO</button>
+          <button type="button" class="troop-btn alliance-btn" data-alliance="owo">OWO</button>
+          <button type="button" class="troop-btn alliance-btn" data-alliance="neco">NECO</button>
+          <button type="button" class="troop-btn alliance-btn" data-alliance="kuon">KUON</button>
+          <button type="button" class="troop-btn alliance-btn" data-alliance="tbd"><span data-i="allianceTbd"></span></button>
+        </div>
+      </div>
+
+      <div class="field">
         <label class="field-label" data-i="power"></label>
         <input type="text" id="f_power" inputmode="numeric" data-i-ph="powerPh" maxlength="20" />
       </div>
@@ -501,11 +533,13 @@
         <span class="admin-count" id="adminCount"></span>
       </div>
       <div class="admin-actions">
+        <button class="small-btn" id="statsToggleBtn" data-i="adminStats"></button>
         <button class="small-btn" id="copyCsvBtn" data-i="adminCopy"></button>
         <button class="small-btn" id="closeAdminBtn" data-i="adminClose"></button>
         <button class="modal-x" id="overlayXBtn">&times;</button>
       </div>
     </div>
+    <div class="stats-panel" id="statsPanel" style="display:none;"></div>
     <div class="sort-bar">
       <span class="sort-label" data-i="sortLabel"></span>
       <button class="sort-btn active" data-sort="score_desc" data-i="sortScoreDesc"></button>
@@ -564,6 +598,9 @@ const I18N = {
     fighter: "파이터",
     shooter: "슈터",
     rider: "라이더",
+    allianceLabel: "가입 희망 연맹",
+    allianceTbd: "미정",
+    statsByAlliance: "희망 연맹별 분포",
     power: "1군 전투력",
     powerPh: "예: 1.2G",
     score: "이민 점수",
@@ -575,6 +612,12 @@ const I18N = {
     sortScoreDesc: "점수 높은순",
     sortScoreAsc: "점수 낮은순",
     sortRecent: "최신순",
+    adminStats: "통계",
+    statsTotal: "총 신청",
+    statsByTier: "등급별 분포",
+    statsByTroop: "병종별 분포",
+    statsNoTroop: "미선택",
+    statsPeople: "명",
     tierS: "특급 (110M 초과)",
     tierA: "고급 (57~110M)",
     tierB: "중급 (29~57M)",
@@ -620,6 +663,9 @@ const I18N = {
     fighter: "Fighter",
     shooter: "Shooter",
     rider: "Rider",
+    allianceLabel: "Preferred Alliance",
+    allianceTbd: "Undecided",
+    statsByAlliance: "By Preferred Alliance",
     power: "Primary Power",
     powerPh: "e.g. 1.2G",
     score: "Migration Score",
@@ -631,6 +677,12 @@ const I18N = {
     sortScoreDesc: "Highest Score",
     sortScoreAsc: "Lowest Score",
     sortRecent: "Most Recent",
+    adminStats: "Stats",
+    statsTotal: "Total Applications",
+    statsByTier: "By Grade",
+    statsByTroop: "By Troop Type",
+    statsNoTroop: "Not selected",
+    statsPeople: "",
     tierS: "Elite (over 110M)",
     tierA: "High (57–110M)",
     tierB: "Mid (29–57M)",
@@ -676,6 +728,9 @@ const I18N = {
     fighter: "ファイター",
     shooter: "シューター",
     rider: "ライダー",
+    allianceLabel: "希望同盟",
+    allianceTbd: "未定",
+    statsByAlliance: "希望同盟別分布",
     power: "主力戦力",
     powerPh: "例：1.2G",
     score: "移民スコア",
@@ -687,6 +742,12 @@ const I18N = {
     sortScoreDesc: "スコア高い順",
     sortScoreAsc: "スコア低い順",
     sortRecent: "最新順",
+    adminStats: "統計",
+    statsTotal: "総申請数",
+    statsByTier: "等級別分布",
+    statsByTroop: "兵種別分布",
+    statsNoTroop: "未選択",
+    statsPeople: "名",
     tierS: "特級（110M超）",
     tierA: "高級（57〜110M）",
     tierB: "中級（29〜57M）",
@@ -732,6 +793,9 @@ const I18N = {
     fighter: "战士",
     shooter: "射手",
     rider: "骑兵",
+    allianceLabel: "意向联盟",
+    allianceTbd: "未定",
+    statsByAlliance: "按意向联盟分布",
     power: "主力战力",
     powerPh: "例：1.2G",
     score: "迁服积分",
@@ -743,6 +807,12 @@ const I18N = {
     sortScoreDesc: "积分从高到低",
     sortScoreAsc: "积分从低到高",
     sortRecent: "最新提交",
+    adminStats: "统计",
+    statsTotal: "申请总数",
+    statsByTier: "按等级分布",
+    statsByTroop: "按兵种分布",
+    statsNoTroop: "未选择",
+    statsPeople: "人",
     tierS: "特级（超过110M）",
     tierA: "高级（57-110M）",
     tierB: "中级（29-57M）",
@@ -772,6 +842,7 @@ const I18N = {
 
 let currentLang = "ko";
 let selectedTroop = null;
+let selectedAlliance = null;
 let adminAuthed = false;
 
 function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.ko[key] || key; }
@@ -797,12 +868,22 @@ document.querySelectorAll(".langbtn").forEach(btn=>{
   });
 });
 
-document.querySelectorAll(".troop-btn").forEach(btn=>{
+document.querySelectorAll(".troop-btn[data-troop]").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     const val = btn.dataset.troop;
     selectedTroop = (selectedTroop === val) ? null : val;
-    document.querySelectorAll(".troop-btn").forEach(b=>{
+    document.querySelectorAll(".troop-btn[data-troop]").forEach(b=>{
       b.classList.toggle("selected", b.dataset.troop === selectedTroop);
+    });
+  });
+});
+
+document.querySelectorAll(".alliance-btn[data-alliance]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const val = btn.dataset.alliance;
+    selectedAlliance = (selectedAlliance === val) ? null : val;
+    document.querySelectorAll(".alliance-btn[data-alliance]").forEach(b=>{
+      b.classList.toggle("selected", b.dataset.alliance === selectedAlliance);
     });
   });
 });
@@ -870,6 +951,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   const entry = {
     nickname, server, uid,
     troop: selectedTroop || "",
+    alliance: selectedAlliance || "",
     power: power || "",
     score: score || "",
     submittedAt: new Date().toISOString(),
@@ -886,11 +968,13 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
 
     const box = document.getElementById("summaryBox");
     box.innerHTML = "";
+    const allianceLabels = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON", tbd:t("allianceTbd")};
     const rows = [
       [t("nickname"), entry.nickname],
       [t("currentServer"), entry.server],
       [t("uidLabel"), entry.uid],
       [t("troopType"), entry.troop ? t(entry.troop) : t("notSet")],
+      [t("allianceLabel"), entry.alliance ? (allianceLabels[entry.alliance] || entry.alliance) : t("notSet")],
       [t("power"), entry.power || t("notSet")],
       [t("score"), entry.score || t("notSet")]
     ];
@@ -921,6 +1005,7 @@ document.getElementById("newAppBtn").addEventListener("click", ()=>{
   powerInput.value = "";
   scoreInput.value = "";
   selectedTroop = null;
+  selectedAlliance = null;
   document.querySelectorAll(".troop-btn").forEach(b=>b.classList.remove("selected"));
   document.getElementById("successView").style.display = "none";
   document.getElementById("formView").style.display = "block";
@@ -984,6 +1069,12 @@ document.querySelectorAll(".sort-btn").forEach(btn=>{
   });
 });
 
+document.getElementById("statsToggleBtn").addEventListener("click", ()=>{
+  const panel = document.getElementById("statsPanel");
+  const showing = panel.style.display !== "none";
+  panel.style.display = showing ? "none" : "block";
+});
+
 function fmtTime(iso){
   try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; }
 }
@@ -1018,10 +1109,106 @@ function tierOf(scoreStr){
   return "c";
 }
 
+function renderStats(list){
+  const panel = document.getElementById("statsPanel");
+  const total = list.length;
+
+  // tier breakdown
+  const tierCounts = {s:0, a:0, b:0, c:0};
+  list.forEach(e=>{
+    tierCounts[tierOf(e.score)]++;
+  });
+
+  // troop breakdown
+  const troopCounts = {fighter:0, shooter:0, rider:0, none:0};
+  list.forEach(e=>{
+    if(e.troop && troopCounts.hasOwnProperty(e.troop)) troopCounts[e.troop]++;
+    else troopCounts.none++;
+  });
+
+  // preferred alliance breakdown
+  const allianceCounts = {z3ro:0, owo:0, neco:0, kuon:0, none:0};
+  list.forEach(e=>{
+    if(e.alliance && e.alliance !== "tbd" && allianceCounts.hasOwnProperty(e.alliance)) allianceCounts[e.alliance]++;
+    else allianceCounts.none++;
+  });
+
+  const tierRows = [
+    ["s", tierCounts.s, "var(--tier-elite)", t("tierS")],
+    ["a", tierCounts.a, "var(--tier-high)", t("tierA")],
+    ["b", tierCounts.b, "var(--tier-mid)", t("tierB")],
+    ["c", tierCounts.c, "var(--tier-low)", t("tierC")]
+  ];
+  const troopRows = [
+    ["fighter", troopCounts.fighter, t("fighter")],
+    ["shooter", troopCounts.shooter, t("shooter")],
+    ["rider", troopCounts.rider, t("rider")],
+    ["none", troopCounts.none, t("statsNoTroop")]
+  ];
+  const allianceRows = [
+    ["z3ro", allianceCounts.z3ro, "Z3RO"],
+    ["owo", allianceCounts.owo, "OWO"],
+    ["neco", allianceCounts.neco, "NECO"],
+    ["kuon", allianceCounts.kuon, "KUON"],
+    ["none", allianceCounts.none, t("allianceTbd")]
+  ];
+  const maxTierCount = Math.max(1, ...tierRows.map(r=>r[1]));
+  const maxTroopCount = Math.max(1, ...troopRows.map(r=>r[1]));
+  const maxAllianceCount = Math.max(1, ...allianceRows.map(r=>r[1]));
+
+  const tierBarsHtml = tierRows.map(([key,count,color,label])=>`
+    <div class="stat-bar-row">
+      <span class="stat-bar-label">${escapeHtml(label.split(" ")[0])}</span>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${(count/maxTierCount*100)}%;background:${color};"></div></div>
+      <span class="stat-bar-count">${count}</span>
+    </div>`).join("");
+
+  const troopBarsHtml = troopRows.map(([key,count,label])=>`
+    <div class="stat-bar-row">
+      <span class="stat-bar-label">${escapeHtml(label)}</span>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${(count/maxTroopCount*100)}%;background:var(--console);"></div></div>
+      <span class="stat-bar-count">${count}</span>
+    </div>`).join("");
+
+  const allianceBarsHtml = allianceRows.map(([key,count,label])=>`
+    <div class="stat-bar-row">
+      <span class="stat-bar-label">${escapeHtml(label)}</span>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${(count/maxAllianceCount*100)}%;background:#3ec6ea;"></div></div>
+      <span class="stat-bar-count">${count}</span>
+    </div>`).join("");
+
+  panel.innerHTML = `
+    <div class="stats-summary">
+      <div class="stat-chip">
+        <div class="num">${total}</div>
+        <div class="lbl">${t("statsTotal")}</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div>
+        <div class="stats-block-title">${t("statsByTier")}</div>
+        ${tierBarsHtml}
+      </div>
+      <div>
+        <div class="stats-block-title">${t("statsByTroop")}</div>
+        ${troopBarsHtml}
+      </div>
+      <div>
+        <div class="stats-block-title">${t("statsByAlliance")}</div>
+        ${allianceBarsHtml}
+      </div>
+    </div>
+  `;
+}
+
+let lastList = [];
+
 async function renderAdminList(){
   const list = await loadApplications();
+  lastList = list;
   const container = document.getElementById("adminList");
   document.getElementById("adminCount").textContent = list.length + (currentLang==="ko" ? "건" : currentLang==="ja" ? "件" : currentLang==="zh" ? "件" : "");
+  renderStats(list);
 
   if(!list.length){
     container.innerHTML = '<div class="empty-state"></div>';
@@ -1042,23 +1229,33 @@ async function renderAdminList(){
     });
   }
 
+const ALLIANCE_LABELS = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON"};
+function allianceDisplay(key){
+  if(!key) return "";
+  if(key === "tbd") return t("allianceTbd");
+  return ALLIANCE_LABELS[key] || key;
+}
+
   container.innerHTML = "";
   list.forEach(entry=>{
     const tier = tierOf(entry.score);
     const troopLabel = entry.troop ? t(entry.troop) : t("notSet");
+    const powerLabel = entry.power || t("notSet");
+    const allianceLabel = entry.alliance ? allianceDisplay(entry.alliance) : "";
     const card = document.createElement("div");
     card.className = "app-card tier-" + tier + "-card";
     card.innerHTML = `
       <div class="app-card-top">
-        <div>
-          <div class="app-nickname">${escapeHtml(entry.nickname)}</div>
+        <div class="app-name-wrap">
+          <span class="app-nickname">${escapeHtml(entry.nickname)}</span>
           <span class="app-server-tag">${escapeHtml(entry.server)}</span>
+          ${allianceLabel ? `<span class="app-alliance-tag">${escapeHtml(allianceLabel)}</span>` : ""}
         </div>
         <div class="app-score-badge tier-${tier}">${escapeHtml(entry.score || t("notSet"))}</div>
       </div>
-      <div class="app-row"><span>UID</span><span>${escapeHtml(entry.uid)}</span></div>
-      <div class="app-row"><span>${t("colTroop")}</span><span>${escapeHtml(troopLabel)}</span></div>
-      <div class="app-row"><span>${t("colPower")}</span><span>${escapeHtml(entry.power || t("notSet"))}</span></div>
+      <div class="app-meta" title="UID ${escapeHtml(entry.uid)} / ${escapeHtml(troopLabel)} / ${escapeHtml(powerLabel)}">
+        UID <b>${escapeHtml(entry.uid)}</b><span class="sep">·</span><b>${escapeHtml(troopLabel)}</b><span class="sep">·</span><b>${escapeHtml(powerLabel)}</b>
+      </div>
       <div class="app-card-foot">
         <span class="app-time">${fmtTime(entry.submittedAt)}</span>
         <button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button>
@@ -1087,10 +1284,10 @@ function escapeHtml(str){
 document.getElementById("copyCsvBtn").addEventListener("click", async ()=>{
   const list = await loadApplications();
   list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
-  const header = ["nickname","server","uid","troop","power","score","submittedAt"];
+  const header = ["nickname","server","uid","troop","alliance","power","score","submittedAt"];
   const lines = [header.join(",")];
   list.forEach(e=>{
-    const row = [e.nickname, e.server, e.uid, e.troop, e.power, e.score, e.submittedAt]
+    const row = [e.nickname, e.server, e.uid, e.troop, e.alliance, e.power, e.score, e.submittedAt]
       .map(v => '"' + String(v||"").replace(/"/g,'""') + '"');
     lines.push(row.join(","));
   });
