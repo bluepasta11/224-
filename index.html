@@ -164,7 +164,7 @@
   input::placeholder{color:var(--text-faint);}
   input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,122,26,0.14);}
   input.invalid{border-color:var(--danger);}
-  #f_uid{font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;font-size:14px;}
+  #f_uid{font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;font-size:14px;padding-right:52px;}
 
   .field{margin-bottom:18px;}
   .uid-wrap{position:relative;}
@@ -380,6 +380,11 @@
         <input type="text" id="f_power" inputmode="numeric" data-i-ph="powerPh" maxlength="20" />
       </div>
 
+      <div class="field">
+        <label class="field-label" data-i="score"></label>
+        <input type="text" id="f_score" data-i-ph="scorePh" maxlength="20" />
+      </div>
+
       <button class="submit-btn" id="submitBtn" data-i="submit"></button>
     </div>
 
@@ -466,7 +471,9 @@ const I18N = {
     shooter: "슈터",
     rider: "라이더",
     power: "1군 전투력",
-    powerPh: "예: 1.2억",
+    powerPh: "예: 1.2G",
+    score: "이민 점수",
+    scorePh: "예: 20m",
     submit: "확인 후 신청서 작성하기 →",
     requiredError: "필수 항목(닉네임, 현재 서버, UID 16자리)을 모두 입력해주세요.",
     stampText: "접수완료",
@@ -486,7 +493,7 @@ const I18N = {
     adminCopy: "CSV 복사",
     adminCopied: "클립보드에 복사되었습니다.",
     adminClose: "닫기",
-    colNickname: "닉네임", colServer: "서버", colUid: "UID", colTroop: "병종", colPower: "전투력", colTime: "접수시각",
+    colNickname: "닉네임", colServer: "서버", colUid: "UID", colTroop: "병종", colPower: "전투력", colScore: "이민 점수", colTime: "접수시각",
     notSet: "-", deleteConfirm: "이 신청서를 삭제할까요?", deleted: "삭제되었습니다.",
     submitted: "신청서가 접수되었습니다."
   },
@@ -511,7 +518,9 @@ const I18N = {
     shooter: "Shooter",
     rider: "Rider",
     power: "Primary Power",
-    powerPh: "e.g. 120M",
+    powerPh: "e.g. 1.2G",
+    score: "Migration Score",
+    scorePh: "e.g. 20m",
     submit: "Confirm & Submit Application →",
     requiredError: "Please fill in all required fields (Nickname, Current Server, 16-digit UID).",
     stampText: "RECEIVED",
@@ -531,7 +540,7 @@ const I18N = {
     adminCopy: "Copy CSV",
     adminCopied: "Copied to clipboard.",
     adminClose: "Close",
-    colNickname: "Nickname", colServer: "Server", colUid: "UID", colTroop: "Troop", colPower: "Power", colTime: "Submitted",
+    colNickname: "Nickname", colServer: "Server", colUid: "UID", colTroop: "Troop", colPower: "Power", colScore: "Score", colTime: "Submitted",
     notSet: "-", deleteConfirm: "Delete this application?", deleted: "Deleted.",
     submitted: "Application submitted."
   },
@@ -556,7 +565,9 @@ const I18N = {
     shooter: "シューター",
     rider: "ライダー",
     power: "主力戦力",
-    powerPh: "例：1.2億",
+    powerPh: "例：1.2G",
+    score: "移民スコア",
+    scorePh: "例：20m",
     submit: "確認して申請する →",
     requiredError: "必須項目（ニックネーム、現在のサーバー、UID16桁）をすべて入力してください。",
     stampText: "受付完了",
@@ -576,7 +587,7 @@ const I18N = {
     adminCopy: "CSVをコピー",
     adminCopied: "クリップボードにコピーしました。",
     adminClose: "閉じる",
-    colNickname: "ニックネーム", colServer: "サーバー", colUid: "UID", colTroop: "兵種", colPower: "戦力", colTime: "受付時刻",
+    colNickname: "ニックネーム", colServer: "サーバー", colUid: "UID", colTroop: "兵種", colPower: "戦力", colScore: "スコア", colTime: "受付時刻",
     notSet: "-", deleteConfirm: "この申請を削除しますか？", deleted: "削除しました。",
     submitted: "申請が送信されました。"
   },
@@ -601,7 +612,9 @@ const I18N = {
     shooter: "射手",
     rider: "骑兵",
     power: "主力战力",
-    powerPh: "例：1.2亿",
+    powerPh: "例：1.2G",
+    score: "迁服积分",
+    scorePh: "例：20m",
     submit: "确认并提交申请 →",
     requiredError: "请填写所有必填项（昵称、当前服务器、16位UID）。",
     stampText: "已受理",
@@ -621,7 +634,7 @@ const I18N = {
     adminCopy: "复制CSV",
     adminCopied: "已复制到剪贴板。",
     adminClose: "关闭",
-    colNickname: "昵称", colServer: "服务器", colUid: "UID", colTroop: "兵种", colPower: "战力", colTime: "提交时间",
+    colNickname: "昵称", colServer: "服务器", colUid: "UID", colTroop: "兵种", colPower: "战力", colScore: "积分", colTime: "提交时间",
     notSet: "-", deleteConfirm: "确定要删除此申请吗？", deleted: "已删除。",
     submitted: "申请已提交。"
   }
@@ -674,9 +687,7 @@ uidInput.addEventListener("input", ()=>{
 });
 
 const powerInput = document.getElementById("f_power");
-powerInput.addEventListener("input", ()=>{
-  powerInput.value = powerInput.value.replace(/[^0-9.]/g,"");
-});
+const scoreInput = document.getElementById("f_score");
 
 function showToast(msg){
   const el = document.getElementById("toast");
@@ -706,6 +717,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   const server = document.getElementById("f_server").value.trim();
   const uid = uidInput.value.trim();
   const power = powerInput.value.trim();
+  const score = scoreInput.value.trim();
 
   let valid = true;
   if(uid.length !== 16){
@@ -720,6 +732,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
     nickname, server, uid,
     troop: selectedTroop || "",
     power: power || "",
+    score: score || "",
     submittedAt: new Date().toISOString(),
     lang: currentLang
   };
@@ -739,7 +752,8 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
       [t("currentServer"), entry.server],
       [t("uidLabel"), entry.uid],
       [t("troopType"), entry.troop ? t(entry.troop) : t("notSet")],
-      [t("power"), entry.power || t("notSet")]
+      [t("power"), entry.power || t("notSet")],
+      [t("score"), entry.score || t("notSet")]
     ];
     rows.forEach(([label,val])=>{
       const d = document.createElement("div");
@@ -766,6 +780,7 @@ document.getElementById("newAppBtn").addEventListener("click", ()=>{
   uidInput.value = "";
   uidCounter.textContent = "0/16";
   powerInput.value = "";
+  scoreInput.value = "";
   selectedTroop = null;
   document.querySelectorAll(".troop-btn").forEach(b=>b.classList.remove("selected"));
   document.getElementById("successView").style.display = "none";
@@ -826,7 +841,7 @@ async function renderAdminList(){
   const tbl = document.createElement("table");
   tbl.innerHTML = `<thead><tr>
     <th>${t("colNickname")}</th><th>${t("colServer")}</th><th>${t("colUid")}</th>
-    <th>${t("colTroop")}</th><th>${t("colPower")}</th><th>${t("colTime")}</th><th></th>
+    <th>${t("colTroop")}</th><th>${t("colPower")}</th><th>${t("colScore")}</th><th>${t("colTime")}</th><th></th>
   </tr></thead>`;
   const tbody = document.createElement("tbody");
   list.forEach(entry=>{
@@ -838,6 +853,7 @@ async function renderAdminList(){
       <td>${escapeHtml(entry.uid)}</td>
       <td>${escapeHtml(troopLabel)}</td>
       <td>${escapeHtml(entry.power || t("notSet"))}</td>
+      <td>${escapeHtml(entry.score || t("notSet"))}</td>
       <td>${fmtTime(entry.submittedAt)}</td>
       <td><button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button></td>
     `;
@@ -868,10 +884,10 @@ function escapeHtml(str){
 document.getElementById("copyCsvBtn").addEventListener("click", async ()=>{
   const list = await loadApplications();
   list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
-  const header = ["nickname","server","uid","troop","power","submittedAt"];
+  const header = ["nickname","server","uid","troop","power","score","submittedAt"];
   const lines = [header.join(",")];
   list.forEach(e=>{
-    const row = [e.nickname, e.server, e.uid, e.troop, e.power, e.submittedAt]
+    const row = [e.nickname, e.server, e.uid, e.troop, e.power, e.score, e.submittedAt]
       .map(v => '"' + String(v||"").replace(/"/g,'""') + '"');
     lines.push(row.join(","));
   });
