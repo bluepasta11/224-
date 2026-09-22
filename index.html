@@ -722,6 +722,41 @@ const COLLECTION = "applications_224";
 // Set your own admin password here.
 const ADMIN_PASSWORD = "224admin";
 
+// Discord webhook: paste the URL you copied from Discord (Channel Settings
+// > Integrations > Webhooks > New Webhook > Copy Webhook URL) here.
+// Leave it empty ("") to disable Discord notifications.
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551863012829429770/zATo9MU0ZLgYqEu3E14aFXbCIDk4sqJVGh3Iv2FeglIMLR7DchdKCHYQdcXO2VTDFriG";
+
+async function sendDiscordNotification(entry){
+  if(!DISCORD_WEBHOOK_URL) return;
+  try{
+    const tier = tierOf(entry.score);
+    const tierNames = {s: t("tierS"), a: t("tierA"), b: t("tierB"), c: t("tierC")};
+    const allianceMap = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON", tbd:t("allianceTbd")};
+    const embed = {
+      title: "🆕 새 이민 신청 / New Application",
+      color: 0xff7a1a,
+      fields: [
+        { name: "닉네임", value: entry.nickname || "-", inline: true },
+        { name: "현재 서버", value: entry.server || "-", inline: true },
+        { name: "등급", value: tierNames[tier] || "-", inline: true },
+        { name: "이민 점수", value: entry.score || "-", inline: true },
+        { name: "병종", value: entry.troop ? t(entry.troop) : "-", inline: true },
+        { name: "희망 연맹", value: entry.alliance ? (allianceMap[entry.alliance] || entry.alliance) : "-", inline: true },
+        { name: "UID", value: entry.uid || "-", inline: false }
+      ],
+      timestamp: new Date().toISOString()
+    };
+    await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ embeds: [embed] })
+    });
+  }catch(e){
+    console.error("Discord notification failed:", e);
+  }
+}
+
 const I18N = {
   ko: {
     emblemTag: "서버 이민",
@@ -1255,6 +1290,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
 
   try{
     await addApplication(entry);
+    sendDiscordNotification(entry);
 
     const box = document.getElementById("summaryBox");
     box.innerHTML = "";
