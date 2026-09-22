@@ -315,6 +315,21 @@
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
 
   /* stats panel */
+  /* tier settings panel */
+  .tier-settings-panel{margin-bottom:18px;padding:14px 16px;background:#101410;border:1px solid var(--console-dim);}
+  .tier-settings-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px;}
+  .tier-settings-field{display:flex;flex-direction:column;gap:5px;}
+  .tier-settings-field label{font-size:10px;color:var(--console-dim);white-space:nowrap;}
+  .tier-settings-field input{
+    width:90px;background:#0b0d0b;border:1px solid var(--console-dim);color:var(--console);
+    font-family:'JetBrains Mono',monospace;padding:8px 10px;font-size:13px;outline:none;
+  }
+  .tier-settings-field input:focus{border-color:var(--console);}
+  #saveTierBtn{
+    font-family:'JetBrains Mono',monospace;background:var(--console);border:none;
+    padding:9px 16px;color:#08130c;font-weight:600;font-size:12px;cursor:pointer;height:35px;
+  }
+
   .stats-panel{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #14201a;}
   .stats-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
   .stat-chip{background:#101410;border:1px solid #1c2621;padding:9px 14px;min-width:96px;flex:1;}
@@ -533,11 +548,31 @@
         <span class="admin-count" id="adminCount"></span>
       </div>
       <div class="admin-actions">
+        <button class="small-btn" id="tierSettingsToggleBtn" data-i="tierSettings"></button>
         <button class="small-btn" id="statsToggleBtn" data-i="adminStats"></button>
         <button class="small-btn" id="copyCsvBtn" data-i="adminCopy"></button>
         <button class="small-btn" id="closeAdminBtn" data-i="adminClose"></button>
         <button class="modal-x" id="overlayXBtn">&times;</button>
       </div>
+    </div>
+    <div class="tier-settings-panel" id="tierSettingsPanel" style="display:none;">
+      <div class="stats-block-title" data-i="tierSettings"></div>
+      <div class="tier-settings-row">
+        <div class="tier-settings-field">
+          <label data-i="tierSettingsSLabel"></label>
+          <input type="number" id="cfgS" inputmode="numeric" />
+        </div>
+        <div class="tier-settings-field">
+          <label data-i="tierSettingsALabel"></label>
+          <input type="number" id="cfgA" inputmode="numeric" />
+        </div>
+        <div class="tier-settings-field">
+          <label data-i="tierSettingsBLabel"></label>
+          <input type="number" id="cfgB" inputmode="numeric" />
+        </div>
+        <button id="saveTierBtn" data-i="tierSettingsSave"></button>
+      </div>
+      <div class="errmsg console-err" id="tierSettingsErr" data-i="tierSettingsInvalid"></div>
     </div>
     <div class="stats-panel" id="statsPanel" style="display:none;"></div>
     <div class="sort-bar">
@@ -547,10 +582,10 @@
       <button class="sort-btn" data-sort="time_desc" data-i="sortRecent"></button>
     </div>
     <div class="legend">
-      <span class="legend-item"><i class="dot tier-s"></i><span data-i="tierS"></span></span>
-      <span class="legend-item"><i class="dot tier-a"></i><span data-i="tierA"></span></span>
-      <span class="legend-item"><i class="dot tier-b"></i><span data-i="tierB"></span></span>
-      <span class="legend-item"><i class="dot tier-c"></i><span data-i="tierC"></span></span>
+      <span class="legend-item"><i class="dot tier-s"></i><span id="legendTierS"></span></span>
+      <span class="legend-item"><i class="dot tier-a"></i><span id="legendTierA"></span></span>
+      <span class="legend-item"><i class="dot tier-b"></i><span id="legendTierB"></span></span>
+      <span class="legend-item"><i class="dot tier-c"></i><span id="legendTierC"></span></span>
     </div>
     <div id="adminList" class="app-grid"></div>
   </div>
@@ -618,10 +653,17 @@ const I18N = {
     statsByTroop: "병종별 분포",
     statsNoTroop: "미선택",
     statsPeople: "명",
-    tierS: "특급 (110M 초과)",
-    tierA: "고급 (57~110M)",
-    tierB: "중급 (29~57M)",
-    tierC: "일반 (0~29M)",
+    tierS: "특급",
+    tierA: "고급",
+    tierB: "중급",
+    tierC: "일반",
+    tierSettings: "등급 기준",
+    tierSettingsSLabel: "특급 기준 (초과)",
+    tierSettingsALabel: "고급 기준 (이상)",
+    tierSettingsBLabel: "중급 기준 (이상)",
+    tierSettingsSave: "저장",
+    tierSettingsSaved: "등급 기준이 저장되었습니다.",
+    tierSettingsInvalid: "특급 > 고급 > 중급 순서로, 0보다 큰 숫자를 입력해주세요.",
     stampText: "접수완료",
     successTitle: "신청이 완료되었습니다!",
     successDesc: "운영진 확인 후 안내드리겠습니다.",
@@ -683,10 +725,17 @@ const I18N = {
     statsByTroop: "By Troop Type",
     statsNoTroop: "Not selected",
     statsPeople: "",
-    tierS: "Elite (over 110M)",
-    tierA: "High (57–110M)",
-    tierB: "Mid (29–57M)",
-    tierC: "Standard (0–29M)",
+    tierS: "Elite",
+    tierA: "High",
+    tierB: "Mid",
+    tierC: "Standard",
+    tierSettings: "Grade Thresholds",
+    tierSettingsSLabel: "Elite threshold (over)",
+    tierSettingsALabel: "High threshold (at least)",
+    tierSettingsBLabel: "Mid threshold (at least)",
+    tierSettingsSave: "Save",
+    tierSettingsSaved: "Grade thresholds saved.",
+    tierSettingsInvalid: "Enter numbers greater than 0, with Elite > High > Mid.",
     stampText: "RECEIVED",
     successTitle: "Application submitted!",
     successDesc: "Our staff will review it and get back to you.",
@@ -748,10 +797,17 @@ const I18N = {
     statsByTroop: "兵種別分布",
     statsNoTroop: "未選択",
     statsPeople: "名",
-    tierS: "特級（110M超）",
-    tierA: "高級（57〜110M）",
-    tierB: "中級（29〜57M）",
-    tierC: "一般（0〜29M）",
+    tierS: "特級",
+    tierA: "高級",
+    tierB: "中級",
+    tierC: "一般",
+    tierSettings: "等級基準",
+    tierSettingsSLabel: "特級基準（超）",
+    tierSettingsALabel: "高級基準（以上）",
+    tierSettingsBLabel: "中級基準（以上）",
+    tierSettingsSave: "保存",
+    tierSettingsSaved: "等級基準を保存しました。",
+    tierSettingsInvalid: "特級 > 高級 > 中級 の順に、0より大きい数字を入力してください。",
     stampText: "受付完了",
     successTitle: "申請が完了しました！",
     successDesc: "運営スタッフが確認後、ご案内いたします。",
@@ -813,10 +869,17 @@ const I18N = {
     statsByTroop: "按兵种分布",
     statsNoTroop: "未选择",
     statsPeople: "人",
-    tierS: "特级（超过110M）",
-    tierA: "高级（57-110M）",
-    tierB: "中级（29-57M）",
-    tierC: "普通（0-29M）",
+    tierS: "特级",
+    tierA: "高级",
+    tierB: "中级",
+    tierC: "普通",
+    tierSettings: "等级设置",
+    tierSettingsSLabel: "特级阈值（超过）",
+    tierSettingsALabel: "高级阈值（不低于）",
+    tierSettingsBLabel: "中级阈值（不低于）",
+    tierSettingsSave: "保存",
+    tierSettingsSaved: "等级阈值已保存。",
+    tierSettingsInvalid: "请按 特级 > 高级 > 中级 的顺序输入大于0的数字。",
     stampText: "已受理",
     successTitle: "申请提交成功！",
     successDesc: "管理团队审核后会与您联系。",
@@ -859,6 +922,7 @@ function applyLang(){
     b.classList.toggle("active", b.dataset.lang === currentLang);
   });
   document.getElementById("lockIcon").textContent = adminAuthed ? t("adminUnlocked") : t("adminLocked");
+  renderLegend();
 }
 
 document.querySelectorAll(".langbtn").forEach(btn=>{
@@ -1028,6 +1092,8 @@ function closeLoginModal(){
 async function openOverlay(){
   adminOverlay.style.display = "block";
   document.body.style.overflow = "hidden";
+  await loadTierConfig();
+  renderLegend();
   await renderAdminList();
 }
 function closeOverlay(){
@@ -1075,6 +1141,48 @@ document.getElementById("statsToggleBtn").addEventListener("click", ()=>{
   panel.style.display = showing ? "none" : "block";
 });
 
+document.getElementById("tierSettingsToggleBtn").addEventListener("click", ()=>{
+  const panel = document.getElementById("tierSettingsPanel");
+  const showing = panel.style.display !== "none";
+  if(!showing){
+    document.getElementById("cfgS").value = TIER_S_MIN;
+    document.getElementById("cfgA").value = TIER_A_MIN;
+    document.getElementById("cfgB").value = TIER_B_MIN;
+    document.getElementById("tierSettingsErr").classList.remove("show");
+  }
+  panel.style.display = showing ? "none" : "block";
+});
+
+document.getElementById("saveTierBtn").addEventListener("click", async ()=>{
+  const s = parseFloat(document.getElementById("cfgS").value);
+  const a = parseFloat(document.getElementById("cfgA").value);
+  const b = parseFloat(document.getElementById("cfgB").value);
+  const errEl = document.getElementById("tierSettingsErr");
+
+  if(isNaN(s) || isNaN(a) || isNaN(b) || b <= 0 || !(s > a && a > b)){
+    errEl.classList.add("show");
+    return;
+  }
+  errEl.classList.remove("show");
+
+  TIER_S_MIN = s;
+  TIER_A_MIN = a;
+  TIER_B_MIN = b;
+
+  const btn = document.getElementById("saveTierBtn");
+  btn.disabled = true;
+  try{
+    await saveTierConfig();
+    renderLegend();
+    await renderAdminList();
+    showToast(t("tierSettingsSaved"));
+  }catch(e){
+    showToast("Error: " + e.message);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
 function fmtTime(iso){
   try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; }
 }
@@ -1095,10 +1203,37 @@ function parseScoreValue(str){
 }
 
 // Score tier thresholds (in the same "million" scale as parseScoreValue).
-// Change these three numbers to match your server's actual score distribution.
-const TIER_S_MIN = 110;
-const TIER_A_MIN = 57;
-const TIER_B_MIN = 29;
+// These are just fallback defaults — the admin can edit and save real
+// values from the dashboard's "등급 기준" panel, stored in Firestore.
+let TIER_S_MIN = 280;
+let TIER_A_MIN = 140;
+let TIER_B_MIN = 90;
+const TIER_CONFIG_COLLECTION = "config_224";
+const TIER_CONFIG_DOC = "tiers";
+
+async function loadTierConfig(){
+  try{
+    const doc = await db.collection(TIER_CONFIG_COLLECTION).doc(TIER_CONFIG_DOC).get();
+    if(doc.exists){
+      const d = doc.data();
+      if(typeof d.s === "number") TIER_S_MIN = d.s;
+      if(typeof d.a === "number") TIER_A_MIN = d.a;
+      if(typeof d.b === "number") TIER_B_MIN = d.b;
+    }
+  }catch(e){
+    console.error("loadTierConfig failed:", e);
+  }
+}
+async function saveTierConfig(){
+  await db.collection(TIER_CONFIG_COLLECTION).doc(TIER_CONFIG_DOC).set({s: TIER_S_MIN, a: TIER_A_MIN, b: TIER_B_MIN});
+}
+
+function renderLegend(){
+  document.getElementById("legendTierS").textContent = `${t("tierS")} (>${TIER_S_MIN}M)`;
+  document.getElementById("legendTierA").textContent = `${t("tierA")} (${TIER_A_MIN}~${TIER_S_MIN}M)`;
+  document.getElementById("legendTierB").textContent = `${t("tierB")} (${TIER_B_MIN}~${TIER_A_MIN}M)`;
+  document.getElementById("legendTierC").textContent = `${t("tierC")} (0~${TIER_B_MIN}M)`;
+}
 
 function tierOf(scoreStr){
   const v = parseScoreValue(scoreStr);
@@ -1158,7 +1293,7 @@ function renderStats(list){
 
   const tierBarsHtml = tierRows.map(([key,count,color,label])=>`
     <div class="stat-bar-row">
-      <span class="stat-bar-label">${escapeHtml(label.split(" ")[0])}</span>
+      <span class="stat-bar-label">${escapeHtml(label)}</span>
       <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${(count/maxTierCount*100)}%;background:${color};"></div></div>
       <span class="stat-bar-count">${count}</span>
     </div>`).join("");
