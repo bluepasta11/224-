@@ -728,32 +728,72 @@ const ADMIN_PASSWORD = "224admin";
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551863012829429770/zATo9MU0ZLgYqEu3E14aFXbCIDk4sqJVGh3Iv2FeglIMLR7DchdKCHYQdcXO2VTDFriG";
 
 async function sendDiscordNotification(entry){
-  if(!DISCORD_WEBHOOK_URL) return;
+  if(!DISCORD_WEBHOOK_URL) return null;
   try{
-    const tier = tierOf(entry.score);
-    const tierNames = {s: t("tierS"), a: t("tierA"), b: t("tierB"), c: t("tierC")};
-    const allianceMap = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON", tbd:t("allianceTbd")};
-    const embed = {
-      title: "🆕 새 이민 신청 / New Application",
-      color: 0xff7a1a,
-      fields: [
-        { name: "닉네임", value: entry.nickname || "-", inline: true },
-        { name: "현재 서버", value: entry.server || "-", inline: true },
-        { name: "등급", value: tierNames[tier] || "-", inline: true },
-        { name: "이민 점수", value: entry.score || "-", inline: true },
-        { name: "병종", value: entry.troop ? t(entry.troop) : "-", inline: true },
-        { name: "희망 연맹", value: entry.alliance ? (allianceMap[entry.alliance] || entry.alliance) : "-", inline: true },
-        { name: "UID", value: entry.uid || "-", inline: false }
-      ],
-      timestamp: new Date().toISOString()
-    };
-    await fetch(DISCORD_WEBHOOK_URL, {
+    const embed = buildDiscordEmbed(entry);
+    const res = await fetch(DISCORD_WEBHOOK_URL + "?wait=true", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ embeds: [embed] })
     });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return data.id || null;
   }catch(e){
     console.error("Discord notification failed:", e);
+    return null;
+  }
+}
+
+function buildDiscordEmbed(entry){
+  const tier = tierOf(entry.score);
+  const tierNames = {s: t("tierS"), a: t("tierA"), b: t("tierB"), c: t("tierC")};
+  const allianceMap = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON", tbd:t("allianceTbd")};
+  return {
+    title: "🆕 새 이민 신청 / New Application",
+    color: 0xff7a1a,
+    fields: [
+      { name: "닉네임", value: entry.nickname || "-", inline: true },
+      { name: "현재 서버", value: entry.server || "-", inline: true },
+      { name: "등급", value: tierNames[tier] || "-", inline: true },
+      { name: "이민 점수", value: entry.score || "-", inline: true },
+      { name: "병종", value: entry.troop ? t(entry.troop) : "-", inline: true },
+      { name: "희망 연맹", value: entry.alliance ? (allianceMap[entry.alliance] || entry.alliance) : "-", inline: true },
+      { name: "UID", value: entry.uid || "-", inline: false }
+    ],
+    timestamp: new Date().toISOString()
+  };
+}
+
+// Edits the original Discord message to show it was deleted, instead of
+// removing it outright — keeps a visible audit trail in the channel.
+async function markDiscordMessageDeleted(entry, messageId){
+  if(!DISCORD_WEBHOOK_URL || !messageId) return;
+  try{
+    const embed = {
+      title: "🗑️ 삭제된 신청 / Deleted",
+      color: 0x555555,
+      description: `~~${entry.nickname || "-"} · ${entry.server || "-"} · UID ${entry.uid || "-"}~~`,
+      timestamp: new Date().toISOString()
+    };
+    await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ embeds: [embed] })
+    });
+  }catch(e){
+    console.error("Discord edit-on-delete failed:", e);
+  }
+}
+// Alternative: fully remove the message instead of marking it deleted.
+// Swap the call in the delete handler from markDiscordMessageDeleted to
+// this function if you'd rather have it disappear entirely.
+async function deleteDiscordMessage(messageId){
+  if(!DISCORD_WEBHOOK_URL || !messageId) return;
+  try{
+    await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, { method: "DELETE" });
+  }catch(e){
+    console.error("Discord delete failed:", e);
   }
 }
 
@@ -1215,7 +1255,7 @@ async function loadApplications(){
   }
 }
 async function addApplication(entry){
-  await db.collection(COLLECTION).add(entry);
+  return await db.collection(COLLECTION).add(entry);
 }
 async function deleteApplication(id){
   await db.collection(COLLECTION).doc(id).delete();
@@ -1289,8 +1329,14 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   };
 
   try{
-    await addApplication(entry);
-    sendDiscordNotification(entry);
+    const docRef = await addApplication(entry);
+    (async ()=>{
+      const msgId = await sendDiscordNotification(entry);
+      if(msgId){
+        try{ await db.collection(COLLECTION).doc(docRef.id).update({ discordMessageId: msgId }); }
+        catch(e){ console.error("Failed to save discordMessageId:", e); }
+      }
+    })();
 
     const box = document.getElementById("summaryBox");
     box.innerHTML = "";
@@ -1854,7 +1900,11 @@ function renderFilteredList(){
     btn.addEventListener("click", async ()=>{
       if(!confirm(t("deleteConfirm"))) return;
       const id = btn.dataset.id;
+      const entry = lastList.find(e => e.id === id);
       await deleteApplication(id);
+      if(entry && entry.discordMessageId){
+        markDiscordMessageDeleted(entry, entry.discordMessageId); // fire and forget
+      }
       showToast(t("deleted"));
       await renderAdminList();
     });
