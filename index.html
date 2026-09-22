@@ -242,6 +242,38 @@
 
   .privacy-note{font-size:11px;color:var(--text-faint);text-align:center;margin:0 24px 26px;line-height:1.7;}
 
+  /* public: check my application status */
+  .status-check-link{
+    display:block;margin:0 auto 28px;background:transparent;border:1px solid var(--line);
+    color:var(--text-dim);font-size:12.5px;font-weight:600;padding:10px 18px;cursor:pointer;
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  }
+  .status-check-link:hover{border-color:var(--accent);color:var(--accent2);}
+  .status-modal-bg{
+    position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.72);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .status-modal{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);padding:22px;}
+  .status-modal-head{display:flex;align-items:center;justify-content:space-between;color:var(--text);font-size:15px;font-weight:700;margin-bottom:16px;}
+  .modal-x-amber{background:none;border:none;color:var(--text-faint);font-size:24px;line-height:1;cursor:pointer;padding:0;}
+  .modal-x-amber:hover{color:var(--accent2);}
+  .status-search-row{display:flex;gap:8px;margin-bottom:16px;}
+  .status-search-row input{flex:1;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
+  .status-search-row button{
+    font-family:'Oswald',sans-serif;background:var(--accent);border:none;padding:0 18px;
+    color:#1a1310;font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .status-result-card{background:var(--bg2);border:1px solid var(--line);padding:16px 17px;}
+  .status-badge-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .status-badge{font-family:'Oswald',sans-serif;font-size:12.5px;font-weight:700;padding:5px 12px;border:1px solid;letter-spacing:0.02em;}
+  .status-badge.pending{color:#c9c2b4;background:rgba(255,255,255,0.04);border-color:#54432f;}
+  .status-badge.approved{color:var(--ok);background:rgba(139,211,92,0.1);border-color:var(--ok);}
+  .status-badge.rejected{color:var(--danger);background:rgba(226,86,74,0.1);border-color:var(--danger);}
+  .status-result-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line-soft);color:var(--text);}
+  .status-result-row:last-child{border-bottom:none;}
+  .status-result-row span:first-child{color:var(--text-dim);}
+  .status-not-found{text-align:center;color:var(--text-faint);font-size:13px;padding:16px 0;}
+
   /* ---- admin: console styling, deliberately distinct from the form above ---- */
   .admin-dock{margin:0 16px;font-family:'JetBrains Mono',monospace;}
   .admin-toggle{
@@ -300,6 +332,19 @@
   }
   .small-btn:hover{border-color:var(--console);color:#c8ffe0;}
   .modal-x{font-size:24px;}
+
+  .filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .search-input{
+    flex:1;min-width:160px;background:#0b0d0b;border:1px solid var(--console-dim);color:var(--console);
+    font-family:'JetBrains Mono',monospace;padding:8px 12px;font-size:12.5px;outline:none;
+  }
+  .search-input::placeholder{color:var(--console-dim);}
+  .search-input:focus{border-color:var(--console);}
+  .filter-select{
+    background:#0b0d0b;border:1px solid var(--console-dim);color:var(--console-dim);
+    font-family:'JetBrains Mono',monospace;padding:8px 8px;font-size:11.5px;outline:none;cursor:pointer;
+  }
+  .filter-select:focus{border-color:var(--console);color:var(--console);}
 
   .sort-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
   .sort-label{font-size:11px;color:var(--console-dim);margin-right:2px;}
@@ -375,7 +420,17 @@
   .app-meta{font-size:10.5px;color:var(--console-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;}
   .app-meta b{color:#cfe9da;font-weight:600;}
   .app-meta .sep{margin:0 5px;opacity:0.5;}
-  .app-card-foot{display:flex;justify-content:space-between;align-items:center;}
+  .app-card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .app-foot-actions{display:flex;align-items:center;gap:6px;}
+  .app-dup-tag{font-size:9.5px;color:#ffb648;border:1px solid #7a4a1a;padding:1px 5px;white-space:nowrap;flex-shrink:0;}
+  .app-card.dup-uid{border-left-color:var(--danger) !important;box-shadow:inset 0 0 0 1px rgba(226,86,74,0.25);}
+  .status-select{
+    background:#0b0d0b;border:1px solid #3a4248;color:#9aa3ab;
+    font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 5px;outline:none;cursor:pointer;
+  }
+  .status-select.status-pending{color:#c9c2b4;border-color:#54432f;}
+  .status-select.status-approved{color:var(--ok);border-color:var(--ok);}
+  .status-select.status-rejected{color:var(--danger);border-color:var(--danger);}
   .app-time{font-size:9.5px;color:var(--console-dim);}
   .del-btn{background:none;border:1px solid rgba(226,86,74,0.5);color:#e79a92;padding:2px 8px;font-size:10px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
   .del-btn:hover{background:rgba(226,86,74,0.12);}
@@ -514,9 +569,32 @@
         <button class="ghost-btn" id="newAppBtn" data-i="newApp"></button>
       </div>
     </div>
+
+    <div id="recruitmentClosedNotice" class="success" style="display:none;">
+      <div class="stamp-wrap"><div class="stamp" style="border-color:var(--text-faint);color:var(--text-faint);" data-i="closedStampText"></div></div>
+      <h3 data-i="recruitmentClosedTitle"></h3>
+      <p data-i="recruitmentClosedDesc"></p>
+    </div>
   </main>
 
   <p class="privacy-note" data-i="privacyNote"></p>
+
+  <button class="status-check-link" id="openStatusCheckBtn" data-i="checkStatusLink"></button>
+
+  <!-- Public: check my application status -->
+  <div class="status-modal-bg" id="statusModalBg" style="display:none;">
+    <div class="status-modal">
+      <div class="status-modal-head">
+        <span data-i="checkStatusTitle"></span>
+        <button class="modal-x-amber" id="statusModalClose">&times;</button>
+      </div>
+      <div class="status-search-row">
+        <input type="text" id="statusUidInput" inputmode="numeric" maxlength="16" data-i-ph="uidPh" />
+        <button id="statusSearchBtn" data-i="checkStatusSearch"></button>
+      </div>
+      <div id="statusResult"></div>
+    </div>
+  </div>
 
   <div class="admin-dock">
     <div class="admin-toggle" id="adminToggle">
@@ -548,6 +626,7 @@
         <span class="admin-count" id="adminCount"></span>
       </div>
       <div class="admin-actions">
+        <button class="small-btn" id="recruitmentToggleBtn"></button>
         <button class="small-btn" id="tierSettingsToggleBtn" data-i="tierSettings"></button>
         <button class="small-btn" id="statsToggleBtn" data-i="adminStats"></button>
         <button class="small-btn" id="copyCsvBtn" data-i="adminCopy"></button>
@@ -575,6 +654,37 @@
       <div class="errmsg console-err" id="tierSettingsErr" data-i="tierSettingsInvalid"></div>
     </div>
     <div class="stats-panel" id="statsPanel" style="display:none;"></div>
+    <div class="filter-bar">
+      <input type="text" id="searchInput" class="search-input" data-i-ph="searchPlaceholder" />
+      <select id="filterTierSel" class="filter-select">
+        <option value="all" data-i="filterTierAll"></option>
+        <option value="s" data-i="tierS"></option>
+        <option value="a" data-i="tierA"></option>
+        <option value="b" data-i="tierB"></option>
+        <option value="c" data-i="tierC"></option>
+      </select>
+      <select id="filterTroopSel" class="filter-select">
+        <option value="all" data-i="filterTroopAll"></option>
+        <option value="fighter" data-i="fighter"></option>
+        <option value="shooter" data-i="shooter"></option>
+        <option value="rider" data-i="rider"></option>
+        <option value="none" data-i="statsNoTroop"></option>
+      </select>
+      <select id="filterAllianceSel" class="filter-select">
+        <option value="all" data-i="filterAllianceAll"></option>
+        <option value="z3ro">Z3RO</option>
+        <option value="owo">OWO</option>
+        <option value="neco">NECO</option>
+        <option value="kuon">KUON</option>
+        <option value="none" data-i="allianceTbd"></option>
+      </select>
+      <select id="filterStatusSel" class="filter-select">
+        <option value="all" data-i="filterStatusAll"></option>
+        <option value="pending" data-i="statusPending"></option>
+        <option value="approved" data-i="statusApproved"></option>
+        <option value="rejected" data-i="statusRejected"></option>
+      </select>
+    </div>
     <div class="sort-bar">
       <span class="sort-label" data-i="sortLabel"></span>
       <button class="sort-btn active" data-sort="score_desc" data-i="sortScoreDesc"></button>
@@ -628,6 +738,7 @@ const I18N = {
     uidLabel: "UID (16자리)",
     uidPh: "숫자 16자리 입력",
     uidError: "UID는 숫자 16자리로 입력해주세요.",
+    duplicateUidError: "이미 이 UID로 접수된 신청 내역이 있습니다. 아래 '내 신청 상태 확인'에서 조회해보세요.",
     uidWarning: "⚠ UID는 게임 내 프로필에서 정확히 확인 후 입력해주세요. 잘못된 UID 입력 시 이민 처리가 불가할 수 있습니다.",
     troopType: "1군 병종",
     fighter: "파이터",
@@ -669,6 +780,26 @@ const I18N = {
     successDesc: "운영진 확인 후 안내드리겠습니다.",
     newApp: "새 신청서 작성",
     privacyNote: "제출된 정보는 224서버 운영진에게 전달되며 이민 심사 목적으로만 사용됩니다.",
+    checkStatusLink: "내 신청 상태 확인",
+    checkStatusTitle: "내 신청 상태 확인",
+    checkStatusSearch: "조회",
+    checkStatusNotFound: "해당 UID로 접수된 신청 내역이 없습니다.",
+    statusPending: "검토중",
+    statusApproved: "승인",
+    statusRejected: "거절",
+    recruitmentClosedTitle: "모집이 마감되었습니다",
+    recruitmentClosedDesc: "다음 이민 시즌에 다시 신청해주세요.",
+    recruitmentOpenBtn: "모집 재개",
+    recruitmentCloseBtn: "모집 마감",
+    recruitmentToggled: "모집 상태가 변경되었습니다.",
+    closedStampText: "마감",
+    searchPlaceholder: "닉네임 또는 UID 검색",
+    filterTierAll: "등급 전체",
+    filterTroopAll: "병종 전체",
+    filterAllianceAll: "연맹 전체",
+    filterStatusAll: "상태 전체",
+    dupUidTag: "⚠ 중복 UID",
+    statusUpdated: "상태가 변경되었습니다.",
     adminPanel: "운영진 관리 패널",
     adminLocked: "LOCKED",
     adminUnlocked: "ACCESS OK",
@@ -700,6 +831,7 @@ const I18N = {
     uidLabel: "UID (16 digits)",
     uidPh: "Enter 16 digit number",
     uidError: "UID must be exactly 16 digits.",
+    duplicateUidError: "An application with this UID has already been submitted. Check its status below with 'Check My Application Status'.",
     uidWarning: "⚠ Please double-check your UID in your in-game profile before entering it. An incorrect UID may prevent your transfer from being processed.",
     troopType: "Primary Troop Type",
     fighter: "Fighter",
@@ -741,6 +873,26 @@ const I18N = {
     successDesc: "Our staff will review it and get back to you.",
     newApp: "Submit another application",
     privacyNote: "Submitted information is shared with the 224 Server staff and used only for immigration review.",
+    checkStatusLink: "Check My Application Status",
+    checkStatusTitle: "Check My Application Status",
+    checkStatusSearch: "Search",
+    checkStatusNotFound: "No application found for this UID.",
+    statusPending: "Pending",
+    statusApproved: "Approved",
+    statusRejected: "Rejected",
+    recruitmentClosedTitle: "Recruitment Closed",
+    recruitmentClosedDesc: "Please check back for the next migration season.",
+    recruitmentOpenBtn: "Reopen Recruitment",
+    recruitmentCloseBtn: "Close Recruitment",
+    recruitmentToggled: "Recruitment status updated.",
+    closedStampText: "CLOSED",
+    searchPlaceholder: "Search by nickname or UID",
+    filterTierAll: "All Grades",
+    filterTroopAll: "All Troops",
+    filterAllianceAll: "All Alliances",
+    filterStatusAll: "All Statuses",
+    dupUidTag: "⚠ Duplicate UID",
+    statusUpdated: "Status updated.",
     adminPanel: "Staff Admin Panel",
     adminLocked: "LOCKED",
     adminUnlocked: "ACCESS OK",
@@ -772,6 +924,7 @@ const I18N = {
     uidLabel: "UID（16桁）",
     uidPh: "16桁の数字を入力",
     uidError: "UIDは16桁の数字で入力してください。",
+    duplicateUidError: "このUIDではすでに申請が提出されています。下の「申請状況の確認」からご確認ください。",
     uidWarning: "⚠ UIDはゲーム内プロフィールで正確に確認してから入力してください。誤ったUIDを入力すると移民処理ができない場合があります。",
     troopType: "主力兵種",
     fighter: "ファイター",
@@ -813,6 +966,26 @@ const I18N = {
     successDesc: "運営スタッフが確認後、ご案内いたします。",
     newApp: "新しい申請書を作成",
     privacyNote: "送信された情報は224サーバー運営スタッフに共有され、移民審査のみに使用されます。",
+    checkStatusLink: "申請状況の確認",
+    checkStatusTitle: "申請状況の確認",
+    checkStatusSearch: "検索",
+    checkStatusNotFound: "このUIDでの申請は見つかりませんでした。",
+    statusPending: "審査中",
+    statusApproved: "承認",
+    statusRejected: "却下",
+    recruitmentClosedTitle: "募集は終了しました",
+    recruitmentClosedDesc: "次回の移民シーズンをお待ちください。",
+    recruitmentOpenBtn: "募集を再開",
+    recruitmentCloseBtn: "募集を終了",
+    recruitmentToggled: "募集状態を変更しました。",
+    closedStampText: "終了",
+    searchPlaceholder: "ニックネームまたはUIDで検索",
+    filterTierAll: "すべての等級",
+    filterTroopAll: "すべての兵種",
+    filterAllianceAll: "すべての同盟",
+    filterStatusAll: "すべての状態",
+    dupUidTag: "⚠ UID重複",
+    statusUpdated: "状態を変更しました。",
     adminPanel: "運営管理パネル",
     adminLocked: "LOCKED",
     adminUnlocked: "ACCESS OK",
@@ -844,6 +1017,7 @@ const I18N = {
     uidLabel: "UID（16位）",
     uidPh: "请输入16位数字",
     uidError: "UID必须为16位数字。",
+    duplicateUidError: "该UID已提交过申请。请在下方「查询申请状态」中查看。",
     uidWarning: "⚠ 请在游戏内个人资料中仔细核对UID后再填写。UID填写错误可能导致无法完成迁服处理。",
     troopType: "主力兵种",
     fighter: "战士",
@@ -885,6 +1059,26 @@ const I18N = {
     successDesc: "管理团队审核后会与您联系。",
     newApp: "提交新的申请",
     privacyNote: "提交的信息将发送给224服管理团队，仅用于迁服审核。",
+    checkStatusLink: "查询申请状态",
+    checkStatusTitle: "查询申请状态",
+    checkStatusSearch: "查询",
+    checkStatusNotFound: "未找到该UID的申请记录。",
+    statusPending: "审核中",
+    statusApproved: "已批准",
+    statusRejected: "已拒绝",
+    recruitmentClosedTitle: "招募已结束",
+    recruitmentClosedDesc: "请等待下一次迁服招募开启。",
+    recruitmentOpenBtn: "重新开放招募",
+    recruitmentCloseBtn: "结束招募",
+    recruitmentToggled: "招募状态已更新。",
+    closedStampText: "已结束",
+    searchPlaceholder: "按昵称或UID搜索",
+    filterTierAll: "全部等级",
+    filterTroopAll: "全部兵种",
+    filterAllianceAll: "全部联盟",
+    filterStatusAll: "全部状态",
+    dupUidTag: "⚠ UID重复",
+    statusUpdated: "状态已更新。",
     adminPanel: "管理员面板",
     adminLocked: "LOCKED",
     adminUnlocked: "ACCESS OK",
@@ -923,6 +1117,7 @@ function applyLang(){
   });
   document.getElementById("lockIcon").textContent = adminAuthed ? t("adminUnlocked") : t("adminLocked");
   renderLegend();
+  if(typeof applyRecruitmentState === "function") applyRecruitmentState();
 }
 
 document.querySelectorAll(".langbtn").forEach(btn=>{
@@ -990,8 +1185,27 @@ async function addApplication(entry){
 async function deleteApplication(id){
   await db.collection(COLLECTION).doc(id).delete();
 }
+async function updateApplicationStatus(id, status){
+  await db.collection(COLLECTION).doc(id).update({status});
+}
+async function findByUid(uid){
+  try{
+    const snap = await db.collection(COLLECTION).where("uid","==",uid).limit(1).get();
+    if(snap.empty) return null;
+    const d = snap.docs[0];
+    return { id: d.id, ...d.data() };
+  }catch(e){
+    console.error("findByUid failed:", e);
+    return null;
+  }
+}
 
 document.getElementById("submitBtn").addEventListener("click", async ()=>{
+  if(recruitmentClosed){
+    showToast(t("recruitmentClosedTitle"));
+    applyRecruitmentState();
+    return;
+  }
   const nickname = document.getElementById("f_nickname").value.trim();
   const server = document.getElementById("f_server").value.trim();
   const uid = uidInput.value.trim();
@@ -1012,20 +1226,32 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   if(!nickname || !server){ valid = false; }
   if(!valid){ showToast(t("requiredError")); return; }
 
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = "...";
+
+  const existing = await findByUid(uid);
+  if(existing){
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    uidInput.classList.add("invalid");
+    document.getElementById("uidErr").textContent = t("duplicateUidError");
+    document.getElementById("uidErr").classList.add("show");
+    showToast(t("duplicateUidError"));
+    return;
+  }
+
   const entry = {
     nickname, server, uid,
     troop: selectedTroop || "",
     alliance: selectedAlliance || "",
     power: power || "",
     score: score || "",
+    status: "pending",
     submittedAt: new Date().toISOString(),
     lang: currentLang
   };
-
-  const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled = true;
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = "...";
 
   try{
     await addApplication(entry);
@@ -1075,10 +1301,113 @@ document.getElementById("newAppBtn").addEventListener("click", ()=>{
   document.getElementById("formView").style.display = "block";
 });
 
+// ---- Public: check my application status ----
+function statusLabel(status){
+  if(status === "approved") return t("statusApproved");
+  if(status === "rejected") return t("statusRejected");
+  return t("statusPending");
+}
+function allianceDisplayPublic(key){
+  const map = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON"};
+  if(!key) return "";
+  if(key === "tbd") return t("allianceTbd");
+  return map[key] || key;
+}
+
+const statusModalBg = document.getElementById("statusModalBg");
+document.getElementById("openStatusCheckBtn").addEventListener("click", ()=>{
+  statusModalBg.style.display = "flex";
+  document.getElementById("statusResult").innerHTML = "";
+  document.getElementById("statusUidInput").value = "";
+  document.getElementById("statusUidInput").focus();
+});
+document.getElementById("statusModalClose").addEventListener("click", ()=>{
+  statusModalBg.style.display = "none";
+});
+document.getElementById("statusUidInput").addEventListener("input", (e)=>{
+  e.target.value = e.target.value.replace(/[^0-9]/g,"").slice(0,16);
+});
+document.getElementById("statusUidInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") document.getElementById("statusSearchBtn").click();
+});
+document.getElementById("statusSearchBtn").addEventListener("click", async ()=>{
+  const uidVal = document.getElementById("statusUidInput").value.trim();
+  const resultEl = document.getElementById("statusResult");
+  if(!uidVal){ return; }
+  resultEl.innerHTML = "...";
+  const found = await findByUid(uidVal);
+  if(!found){
+    resultEl.innerHTML = `<div class="status-not-found">${t("checkStatusNotFound")}</div>`;
+    return;
+  }
+  const status = found.status || "pending";
+  const allianceTxt = found.alliance ? allianceDisplayPublic(found.alliance) : t("notSet");
+  resultEl.innerHTML = `
+    <div class="status-result-card">
+      <div class="status-badge-row">
+        <strong>${escapeHtmlPublic(found.nickname)}</strong>
+        <span class="status-badge ${status}">${statusLabel(status)}</span>
+      </div>
+      <div class="status-result-row"><span>${t("currentServer")}</span><span>${escapeHtmlPublic(found.server)}</span></div>
+      <div class="status-result-row"><span>${t("troopType")}</span><span>${found.troop ? t(found.troop) : t("notSet")}</span></div>
+      <div class="status-result-row"><span>${t("allianceLabel")}</span><span>${escapeHtmlPublic(allianceTxt)}</span></div>
+      <div class="status-result-row"><span>${t("score")}</span><span>${escapeHtmlPublic(found.score || t("notSet"))}</span></div>
+    </div>
+  `;
+});
+function escapeHtmlPublic(str){
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
+
+// ---- Recruitment open/closed ----
+const RECRUITMENT_COLLECTION = "config_224";
+const RECRUITMENT_DOC = "recruitment";
+let recruitmentClosed = false;
+
+async function loadRecruitmentStatus(){
+  try{
+    const doc = await db.collection(RECRUITMENT_COLLECTION).doc(RECRUITMENT_DOC).get();
+    recruitmentClosed = doc.exists ? !!doc.data().closed : false;
+  }catch(e){
+    console.error("loadRecruitmentStatus failed:", e);
+    recruitmentClosed = false;
+  }
+  applyRecruitmentState();
+}
+async function saveRecruitmentStatus(closed){
+  await db.collection(RECRUITMENT_COLLECTION).doc(RECRUITMENT_DOC).set({closed});
+}
+function applyRecruitmentState(){
+  const closedNotice = document.getElementById("recruitmentClosedNotice");
+  const formViewEl = document.getElementById("formView");
+  const successViewEl = document.getElementById("successView");
+  const successShowing = successViewEl.style.display === "block";
+
+  if(recruitmentClosed && !successShowing){
+    closedNotice.style.display = "block";
+    formViewEl.style.display = "none";
+  } else {
+    closedNotice.style.display = "none";
+    if(!successShowing){ formViewEl.style.display = "block"; }
+  }
+  const toggleBtn = document.getElementById("recruitmentToggleBtn");
+  if(toggleBtn){
+    toggleBtn.textContent = recruitmentClosed ? t("recruitmentOpenBtn") : t("recruitmentCloseBtn");
+  }
+}
+loadRecruitmentStatus();
+
 const adminToggle = document.getElementById("adminToggle");
 const adminLoginModal = document.getElementById("adminLoginModal");
 const adminOverlay = document.getElementById("adminOverlay");
 let sortMode = "score_desc";
+let searchQuery = "";
+let filterTier = "all";
+let filterTroop = "all";
+let filterAlliance = "all";
+let filterStatus = "all";
 
 function openLoginModal(){
   adminLoginModal.style.display = "flex";
@@ -1128,10 +1457,10 @@ document.getElementById("closeAdminBtn").addEventListener("click", ()=>{
 });
 
 document.querySelectorAll(".sort-btn").forEach(btn=>{
-  btn.addEventListener("click", async ()=>{
+  btn.addEventListener("click", ()=>{
     sortMode = btn.dataset.sort;
     document.querySelectorAll(".sort-btn").forEach(b=>b.classList.toggle("active", b===btn));
-    await renderAdminList();
+    renderFilteredList();
   });
 });
 
@@ -1139,6 +1468,43 @@ document.getElementById("statsToggleBtn").addEventListener("click", ()=>{
   const panel = document.getElementById("statsPanel");
   const showing = panel.style.display !== "none";
   panel.style.display = showing ? "none" : "block";
+});
+
+document.getElementById("recruitmentToggleBtn").addEventListener("click", async ()=>{
+  const btn = document.getElementById("recruitmentToggleBtn");
+  btn.disabled = true;
+  try{
+    recruitmentClosed = !recruitmentClosed;
+    await saveRecruitmentStatus(recruitmentClosed);
+    applyRecruitmentState();
+    showToast(t("recruitmentToggled"));
+  }catch(e){
+    recruitmentClosed = !recruitmentClosed; // revert on failure
+    showToast("Error: " + e.message);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("searchInput").addEventListener("input", (e)=>{
+  searchQuery = e.target.value;
+  renderFilteredList();
+});
+document.getElementById("filterTierSel").addEventListener("change", (e)=>{
+  filterTier = e.target.value;
+  renderFilteredList();
+});
+document.getElementById("filterTroopSel").addEventListener("change", (e)=>{
+  filterTroop = e.target.value;
+  renderFilteredList();
+});
+document.getElementById("filterAllianceSel").addEventListener("change", (e)=>{
+  filterAlliance = e.target.value;
+  renderFilteredList();
+});
+document.getElementById("filterStatusSel").addEventListener("change", (e)=>{
+  filterStatus = e.target.value;
+  renderFilteredList();
 });
 
 document.getElementById("tierSettingsToggleBtn").addEventListener("click", ()=>{
@@ -1174,7 +1540,7 @@ document.getElementById("saveTierBtn").addEventListener("click", async ()=>{
   try{
     await saveTierConfig();
     renderLegend();
-    await renderAdminList();
+    renderFilteredList();
     showToast(t("tierSettingsSaved"));
   }catch(e){
     showToast("Error: " + e.message);
@@ -1338,23 +1704,69 @@ function renderStats(list){
 
 let lastList = [];
 
-async function renderAdminList(){
+const ALLIANCE_LABELS = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON"};
+function allianceDisplay(key){
+  if(!key) return "";
+  if(key === "tbd") return t("allianceTbd");
+  return ALLIANCE_LABELS[key] || key;
+}
+
+async function refreshAdminList(){
   const list = await loadApplications();
   lastList = list;
-  const container = document.getElementById("adminList");
-  document.getElementById("adminCount").textContent = list.length + (currentLang==="ko" ? "건" : currentLang==="ja" ? "件" : currentLang==="zh" ? "件" : "");
-  renderStats(list);
+  renderFilteredList();
+}
+// kept as an alias since existing callers use this name
+async function renderAdminList(){
+  await refreshAdminList();
+}
 
-  if(!list.length){
+function renderFilteredList(){
+  const list = lastList;
+  const container = document.getElementById("adminList");
+
+  // duplicate UID detection is based on the FULL list, regardless of filters
+  const uidCounts = {};
+  list.forEach(e=>{ uidCounts[e.uid] = (uidCounts[e.uid] || 0) + 1; });
+
+  // apply search + filters
+  const q = searchQuery.trim().toLowerCase();
+  let filtered = list.filter(e=>{
+    if(q){
+      const inNickname = String(e.nickname||"").toLowerCase().includes(q);
+      const inUid = String(e.uid||"").toLowerCase().includes(q);
+      if(!inNickname && !inUid) return false;
+    }
+    if(filterTier !== "all" && tierOf(e.score) !== filterTier) return false;
+    if(filterTroop !== "all"){
+      const tv = e.troop || "none";
+      if(tv !== filterTroop) return false;
+    }
+    if(filterAlliance !== "all"){
+      const av = (e.alliance && e.alliance !== "tbd") ? e.alliance : "none";
+      if(av !== filterAlliance) return false;
+    }
+    if(filterStatus !== "all"){
+      const sv = e.status || "pending";
+      if(sv !== filterStatus) return false;
+    }
+    return true;
+  });
+
+  const suffix = currentLang==="ko" ? "건" : currentLang==="ja" ? "件" : currentLang==="zh" ? "件" : "";
+  document.getElementById("adminCount").textContent = filtered.length + "/" + list.length + suffix;
+  renderStats(filtered);
+
+  if(!filtered.length){
     container.innerHTML = '<div class="empty-state"></div>';
     container.querySelector(".empty-state").textContent = t("adminEmpty");
     return;
   }
 
   if(sortMode === "time_desc"){
-    list.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
+    filtered.sort((a,b)=> new Date(b.submittedAt) - new Date(a.submittedAt));
   } else {
-    list.sort((a,b)=>{
+    filtered.sort((a,b)=>{
       const va = parseScoreValue(a.score);
       const vb = parseScoreValue(b.score);
       if(va === null && vb === null) return 0;
@@ -1364,27 +1776,23 @@ async function renderAdminList(){
     });
   }
 
-const ALLIANCE_LABELS = {z3ro:"Z3RO", owo:"OWO", neco:"NECO", kuon:"KUON"};
-function allianceDisplay(key){
-  if(!key) return "";
-  if(key === "tbd") return t("allianceTbd");
-  return ALLIANCE_LABELS[key] || key;
-}
-
   container.innerHTML = "";
-  list.forEach(entry=>{
+  filtered.forEach(entry=>{
     const tier = tierOf(entry.score);
     const troopLabel = entry.troop ? t(entry.troop) : t("notSet");
     const powerLabel = entry.power || t("notSet");
     const allianceLabel = entry.alliance ? allianceDisplay(entry.alliance) : "";
+    const status = entry.status || "pending";
+    const isDup = uidCounts[entry.uid] > 1;
     const card = document.createElement("div");
-    card.className = "app-card tier-" + tier + "-card";
+    card.className = "app-card tier-" + tier + "-card" + (isDup ? " dup-uid" : "");
     card.innerHTML = `
       <div class="app-card-top">
         <div class="app-name-wrap">
           <span class="app-nickname">${escapeHtml(entry.nickname)}</span>
           <span class="app-server-tag">${escapeHtml(entry.server)}</span>
           ${allianceLabel ? `<span class="app-alliance-tag">${escapeHtml(allianceLabel)}</span>` : ""}
+          ${isDup ? `<span class="app-dup-tag">${t("dupUidTag")}</span>` : ""}
         </div>
         <div class="app-score-badge tier-${tier}">${escapeHtml(entry.score || t("notSet"))}</div>
       </div>
@@ -1393,7 +1801,14 @@ function allianceDisplay(key){
       </div>
       <div class="app-card-foot">
         <span class="app-time">${fmtTime(entry.submittedAt)}</span>
-        <button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button>
+        <div class="app-foot-actions">
+          <select class="status-select status-${status}" data-id="${entry.id}">
+            <option value="pending" ${status==="pending"?"selected":""}>${t("statusPending")}</option>
+            <option value="approved" ${status==="approved"?"selected":""}>${t("statusApproved")}</option>
+            <option value="rejected" ${status==="rejected"?"selected":""}>${t("statusRejected")}</option>
+          </select>
+          <button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button>
+        </div>
       </div>
     `;
     container.appendChild(card);
@@ -1406,6 +1821,22 @@ function allianceDisplay(key){
       await deleteApplication(id);
       showToast(t("deleted"));
       await renderAdminList();
+    });
+  });
+
+  container.querySelectorAll(".status-select").forEach(sel=>{
+    sel.addEventListener("change", async ()=>{
+      const id = sel.dataset.id;
+      const newStatus = sel.value;
+      sel.disabled = true;
+      try{
+        await updateApplicationStatus(id, newStatus);
+        showToast(t("statusUpdated"));
+        await renderAdminList();
+      }catch(e){
+        showToast("Error: " + e.message);
+        sel.disabled = false;
+      }
     });
   });
 }
