@@ -57,11 +57,15 @@
   .banner{
     position:relative;
     padding:16px 18px 34px;
-    background:linear-gradient(160deg,#241a11 0%, #1a1310 65%);
+    background:#181310;
     border-bottom:1px solid var(--line);
     clip-path:polygon(0 0,100% 0,100% 88%,0 100%);
+    min-height:190px;
+    overflow:hidden;
   }
-  .banner-top{display:flex;align-items:center;justify-content:flex-end;}
+  .banner-scene{position:absolute;inset:0;z-index:0;}
+  .banner-scene svg{display:block;width:100%;height:100%;}
+  .banner-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:flex-end;}
   .langbar{display:flex;gap:6px;}
   .langbtn{
     font-family:'Oswald',sans-serif;
@@ -491,6 +495,67 @@
 <div class="scene">
 
   <header class="banner">
+    <div class="banner-scene">
+      <svg viewBox="0 0 600 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#181229"/>
+            <stop offset="45%" stop-color="#241c3a"/>
+            <stop offset="78%" stop-color="#33263a"/>
+            <stop offset="100%" stop-color="#241a11"/>
+          </linearGradient>
+          <linearGradient id="fadeOut" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#181310" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#181310" stop-opacity="1"/>
+          </linearGradient>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffdca0" stop-opacity="0.95"/>
+            <stop offset="40%" stop-color="#ffb648" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#ffb648" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <rect x="0" y="0" width="600" height="220" fill="url(#skyGrad)"/>
+
+        <!-- crows -->
+        <g stroke="#453a56" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.8">
+          <path d="M120 34 q6 -7 12 0 q6 -7 12 0"/>
+          <path d="M170 20 q5 -6 10 0 q5 -6 10 0"/>
+          <path d="M460 44 q6 -7 12 0 q6 -7 12 0"/>
+          <path d="M500 28 q5 -6 10 0 q5 -6 10 0"/>
+        </g>
+
+        <!-- distant hills -->
+        <path d="M0 140 Q80 110 160 132 T320 128 T600 138 V220 H0 Z" fill="#241c30" opacity="0.75"/>
+
+        <!-- treeline -->
+        <g fill="#150f14">
+          <path d="M-10 190 L10 140 L30 190 Z"/>
+          <path d="M15 195 L38 130 L61 195 Z"/>
+          <path d="M50 190 L68 145 L86 190 Z"/>
+          <path d="M80 196 L100 138 L120 196 Z"/>
+          <path d="M410 196 L430 138 L450 196 Z"/>
+          <path d="M440 190 L458 145 L476 190 Z"/>
+          <path d="M465 195 L488 130 L511 195 Z"/>
+          <path d="M500 190 L520 140 L540 190 Z"/>
+          <path d="M530 196 L550 150 L570 196 Z"/>
+          <path d="M565 192 L585 142 L605 192 Z"/>
+        </g>
+
+        <!-- watchtower -->
+        <g>
+          <rect x="277" y="120" width="46" height="76" fill="#120d10"/>
+          <path d="M270 120 L300 96 L330 120 Z" fill="#0e0a0c"/>
+          <rect x="288" y="128" width="24" height="20" fill="#0a0708"/>
+          <circle cx="300" cy="138" r="26" fill="url(#glow)"/>
+          <rect x="291" y="130" width="18" height="14" fill="#ffcf85"/>
+          <rect x="283" y="196" width="6" height="24" fill="#120d10"/>
+          <rect x="311" y="196" width="6" height="24" fill="#120d10"/>
+        </g>
+
+        <rect x="0" y="150" width="600" height="70" fill="url(#fadeOut)"/>
+      </svg>
+    </div>
     <div class="banner-top">
       <div class="langbar">
         <button class="langbtn active" data-lang="ko">한국어</button>
