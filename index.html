@@ -198,6 +198,12 @@
   .troop-btn:hover:not(.selected){border-color:#54432f;color:var(--text);}
 
   .errmsg{color:var(--danger);font-size:11.5px;margin-top:6px;display:none;}
+  .score-preview{font-size:11.5px;margin-top:7px;display:none;font-family:'Oswald',sans-serif;letter-spacing:0.01em;}
+  .score-preview.show{display:block;}
+  .score-preview .tier-tag-s{color:var(--tier-elite);}
+  .score-preview .tier-tag-a{color:var(--tier-high);}
+  .score-preview .tier-tag-b{color:var(--tier-mid);}
+  .score-preview .tier-tag-c{color:var(--tier-low);}
   .errmsg.show{display:block;}
 
   .submit-btn{
@@ -512,6 +518,7 @@
       <div class="field">
         <label class="field-label"><span data-i="score"></span><span class="req">*</span></label>
         <input type="text" id="f_score" data-i-ph="scorePh" maxlength="20" />
+        <div class="score-preview" id="scorePreview"></div>
         <div class="errmsg" id="scoreErr" data-i="scoreError"></div>
       </div>
 
@@ -850,6 +857,8 @@ const I18N = {
     tierSettingsSave: "저장",
     tierSettingsSaved: "등급 기준이 저장되었습니다.",
     tierSettingsInvalid: "특급 > 고급 > 중급 순서로, 0보다 큰 숫자를 입력해주세요.",
+    scorePreviewRecognized: "인식된 값",
+    scorePreviewGrade: "예상 등급",
     stampText: "접수완료",
     successTitle: "신청이 완료되었습니다!",
     successDesc: "운영진 확인 후 안내드리겠습니다.",
@@ -943,6 +952,8 @@ const I18N = {
     tierSettingsSave: "Save",
     tierSettingsSaved: "Grade thresholds saved.",
     tierSettingsInvalid: "Enter numbers greater than 0, with Elite > High > Mid.",
+    scorePreviewRecognized: "Recognized as",
+    scorePreviewGrade: "Estimated grade",
     stampText: "RECEIVED",
     successTitle: "Application submitted!",
     successDesc: "Our staff will review it and get back to you.",
@@ -1036,6 +1047,8 @@ const I18N = {
     tierSettingsSave: "保存",
     tierSettingsSaved: "等級基準を保存しました。",
     tierSettingsInvalid: "特級 > 高級 > 中級 の順に、0より大きい数字を入力してください。",
+    scorePreviewRecognized: "認識された値",
+    scorePreviewGrade: "予想等級",
     stampText: "受付完了",
     successTitle: "申請が完了しました！",
     successDesc: "運営スタッフが確認後、ご案内いたします。",
@@ -1129,6 +1142,8 @@ const I18N = {
     tierSettingsSave: "保存",
     tierSettingsSaved: "等级阈值已保存。",
     tierSettingsInvalid: "请按 特级 > 高级 > 中级 的顺序输入大于0的数字。",
+    scorePreviewRecognized: "识别数值",
+    scorePreviewGrade: "预估等级",
     stampText: "已受理",
     successTitle: "申请提交成功！",
     successDesc: "管理团队审核后会与您联系。",
@@ -1236,7 +1251,27 @@ const scoreInput = document.getElementById("f_score");
 scoreInput.addEventListener("input", ()=>{
   scoreInput.classList.remove("invalid");
   document.getElementById("scoreErr").classList.remove("show");
+  updateScorePreview();
 });
+
+function updateScorePreview(){
+  const previewEl = document.getElementById("scorePreview");
+  const raw = scoreInput.value.trim();
+  if(!raw){
+    previewEl.classList.remove("show");
+    return;
+  }
+  const v = parseScoreValue(raw);
+  if(v === null){
+    previewEl.classList.remove("show");
+    return;
+  }
+  const tier = tierOf(raw);
+  const tierNameKey = {s:"tierS", a:"tierA", b:"tierB", c:"tierC"}[tier];
+  const displayNum = (Math.round(v*10)/10);
+  previewEl.innerHTML = `${t("scorePreviewRecognized")}: <b>${displayNum}M</b> · ${t("scorePreviewGrade")}: <span class="tier-tag-${tier}">${t(tierNameKey)}</span>`;
+  previewEl.classList.add("show");
+}
 
 function showToast(msg){
   const el = document.getElementById("toast");
@@ -1376,6 +1411,7 @@ document.getElementById("newAppBtn").addEventListener("click", ()=>{
   uidCounter.textContent = "0/16";
   powerInput.value = "";
   scoreInput.value = "";
+  document.getElementById("scorePreview").classList.remove("show");
   selectedTroop = null;
   selectedAlliance = null;
   document.querySelectorAll(".troop-btn").forEach(b=>b.classList.remove("selected"));
@@ -1480,6 +1516,7 @@ function applyRecruitmentState(){
   }
 }
 loadRecruitmentStatus();
+loadTierConfig();
 
 const adminToggle = document.getElementById("adminToggle");
 const adminLoginModal = document.getElementById("adminLoginModal");
@@ -1647,7 +1684,14 @@ function parseScoreValue(str){
   const unit = m[2];
   if(unit === "k") num = num / 1000;
   else if(unit === "g" || unit === "b") num = num * 1000;
-  return num; // "m" or no unit is treated as the base (million) scale
+  else if(!unit && num >= 1000){
+    // No unit was given, but the number is far too large to plausibly
+    // already be "in millions" (e.g. someone typed the raw literal score
+    // "63934827" instead of the intended "63.9m"). Treat it as an absolute
+    // value and normalize it down to the million scale automatically.
+    num = num / 1000000;
+  }
+  return num; // "m" or a small unitless number is treated as the base (million) scale
 }
 
 // Score tier thresholds (in the same "million" scale as parseScoreValue).
