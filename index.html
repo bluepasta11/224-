@@ -406,7 +406,9 @@
   .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;}
   .app-card{
     background:#101410;border:1px solid #1c2621;border-left:3px solid #1c2621;padding:10px 12px;
+    cursor:pointer;transition:border-color .15s;
   }
+  .app-card:hover{border-color:#2e3a34;}
   .app-card.tier-s-card{border-left-color:var(--tier-elite);}
   .app-card.tier-a-card{border-left-color:var(--tier-high);}
   .app-card.tier-b-card{border-left-color:var(--tier-mid);}
@@ -430,6 +432,40 @@
   .app-foot-actions{display:flex;align-items:center;gap:6px;}
   .app-dup-tag{font-size:9.5px;color:#ffb648;border:1px solid #7a4a1a;padding:1px 5px;white-space:nowrap;flex-shrink:0;}
   .app-card.dup-uid{border-left-color:var(--danger) !important;box-shadow:inset 0 0 0 1px rgba(226,86,74,0.25);}
+
+  /* Desktop: mobile stays compact/dense as-is; wider screens get bigger, more readable cards */
+  @media (min-width:860px){
+    .admin-overlay{padding:24px 32px 60px;}
+    .app-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+    .app-card{padding:16px 18px;border-left-width:4px;}
+    .app-nickname{font-size:16px;}
+    .app-server-tag,.app-alliance-tag,.app-dup-tag{font-size:11px;padding:2px 7px;}
+    .app-score-badge{font-size:15px;padding:4px 13px;}
+    .app-meta{font-size:12.5px;white-space:normal;overflow:visible;text-overflow:clip;margin-bottom:10px;}
+    .app-time{font-size:11px;}
+    .status-select{font-size:11.5px;padding:5px 7px;}
+    .del-btn{font-size:11.5px;padding:5px 10px;}
+  }
+
+  /* card detail modal */
+  .detail-modal-bg{
+    position:fixed;inset:0;z-index:250;background:rgba(0,0,0,0.75);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .detail-modal{
+    width:100%;max-width:440px;max-height:85vh;overflow-y:auto;
+    background:#101410;border:1px solid var(--console-dim);padding:24px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .detail-nickname{font-size:19px;font-weight:700;color:#eafff2;word-break:break-all;}
+  .detail-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #182019;font-size:13px;}
+  .detail-row:last-of-type{border-bottom:none;}
+  .detail-row span:first-child{color:var(--console-dim);flex-shrink:0;}
+  .detail-row span:last-child{color:#cfe9da;text-align:right;word-break:break-all;}
+  .detail-actions{display:flex;gap:8px;margin-top:18px;align-items:center;}
+  .detail-actions .status-select{flex:1;padding:9px;font-size:12.5px;}
+  .detail-actions .del-btn{padding:9px 16px;font-size:12px;}
   .status-select{
     background:#0b0d0b;border:1px solid #3a4248;color:#9aa3ab;
     font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 5px;outline:none;cursor:pointer;
@@ -705,6 +741,10 @@
       <span class="legend-item"><i class="dot tier-c"></i><span id="legendTierC"></span></span>
     </div>
     <div id="adminList" class="app-grid"></div>
+  </div>
+
+  <div class="detail-modal-bg" id="detailModalBg" style="display:none;">
+    <div class="detail-modal" id="detailModalContent"></div>
   </div>
 
 </div>
@@ -1937,6 +1977,10 @@ function renderFilteredList(){
         </div>
       </div>
     `;
+    card.addEventListener("click", (e)=>{
+      if(e.target.closest(".status-select") || e.target.closest(".del-btn")) return;
+      openDetailModal(entry);
+    });
     container.appendChild(card);
   });
 
@@ -1970,6 +2014,71 @@ function renderFilteredList(){
     });
   });
 }
+
+function openDetailModal(entry){
+  const bg = document.getElementById("detailModalBg");
+  const content = document.getElementById("detailModalContent");
+  const tier = tierOf(entry.score);
+  const troopLabel = entry.troop ? t(entry.troop) : t("notSet");
+  const allianceLabel = entry.alliance ? allianceDisplay(entry.alliance) : t("notSet");
+  const status = entry.status || "pending";
+
+  content.innerHTML = `
+    <div class="detail-head">
+      <div class="detail-nickname">${escapeHtml(entry.nickname)}</div>
+      <button class="modal-x" id="detailModalClose">&times;</button>
+    </div>
+    <div class="detail-row"><span>${t("currentServer")}</span><span>${escapeHtml(entry.server)}</span></div>
+    <div class="detail-row"><span>UID</span><span>${escapeHtml(entry.uid)}</span></div>
+    <div class="detail-row"><span>${t("troopType")}</span><span>${escapeHtml(troopLabel)}</span></div>
+    <div class="detail-row"><span>${t("allianceLabel")}</span><span>${escapeHtml(allianceLabel)}</span></div>
+    <div class="detail-row"><span>${t("power")}</span><span>${escapeHtml(entry.power || t("notSet"))}</span></div>
+    <div class="detail-row"><span>${t("score")}</span><span><span class="app-score-badge tier-${tier}" style="display:inline-block;">${escapeHtml(entry.score || t("notSet"))}</span></span></div>
+    <div class="detail-row"><span>${t("colTime")}</span><span>${fmtTime(entry.submittedAt)}</span></div>
+    <div class="detail-actions">
+      <select class="status-select status-${status}" data-id="${entry.id}">
+        <option value="pending" ${status==="pending"?"selected":""}>${t("statusPending")}</option>
+        <option value="approved" ${status==="approved"?"selected":""}>${t("statusApproved")}</option>
+        <option value="rejected" ${status==="rejected"?"selected":""}>${t("statusRejected")}</option>
+      </select>
+      <button class="del-btn" data-id="${entry.id}">${t("adminDelete")}</button>
+    </div>
+  `;
+  bg.style.display = "flex";
+
+  document.getElementById("detailModalClose").addEventListener("click", closeDetailModal);
+
+  content.querySelector(".status-select").addEventListener("change", async (e)=>{
+    const newStatus = e.target.value;
+    e.target.disabled = true;
+    try{
+      await updateApplicationStatus(entry.id, newStatus);
+      showToast(t("statusUpdated"));
+      closeDetailModal();
+      await renderAdminList();
+    }catch(err){
+      showToast("Error: " + err.message);
+      e.target.disabled = false;
+    }
+  });
+
+  content.querySelector(".del-btn").addEventListener("click", async ()=>{
+    if(!confirm(t("deleteConfirm"))) return;
+    await deleteApplication(entry.id);
+    if(entry.discordMessageId){
+      markDiscordMessageDeleted(entry, entry.discordMessageId); // fire and forget
+    }
+    showToast(t("deleted"));
+    closeDetailModal();
+    await renderAdminList();
+  });
+}
+function closeDetailModal(){
+  document.getElementById("detailModalBg").style.display = "none";
+}
+document.getElementById("detailModalBg").addEventListener("click", (e)=>{
+  if(e.target.id === "detailModalBg") closeDetailModal();
+});
 
 function escapeHtml(str){
   const div = document.createElement("div");
