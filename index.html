@@ -803,7 +803,7 @@ function buildDiscordEmbed(entry){
       { name: "닉네임", value: entry.nickname || "-", inline: true },
       { name: "현재 서버", value: entry.server || "-", inline: true },
       { name: "등급", value: tierNames[tier] || "-", inline: true },
-      { name: "이민 점수", value: entry.score || "-", inline: true },
+      { name: "이민 점수", value: formatScoreDisplay(entry.score) || "-", inline: true },
       { name: "병종", value: entry.troop ? t(entry.troop) : "-", inline: true },
       { name: "희망 연맹", value: entry.alliance ? (allianceMap[entry.alliance] || entry.alliance) : "-", inline: true },
       { name: "UID", value: entry.uid || "-", inline: false }
@@ -1338,6 +1338,9 @@ async function deleteApplication(id){
 async function updateApplicationStatus(id, status){
   await db.collection(COLLECTION).doc(id).update({status});
 }
+async function updateApplicationScore(id, score){
+  await db.collection(COLLECTION).doc(id).update({score});
+}
 async function findByUid(uid){
   try{
     const snap = await db.collection(COLLECTION).where("uid","==",uid).limit(1).get();
@@ -1423,7 +1426,7 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
       [t("troopType"), entry.troop ? t(entry.troop) : t("notSet")],
       [t("allianceLabel"), entry.alliance ? (allianceLabels[entry.alliance] || entry.alliance) : t("notSet")],
       [t("power"), entry.power || t("notSet")],
-      [t("score"), entry.score || t("notSet")]
+      [t("score"), entry.score ? formatScoreDisplay(entry.score) : t("notSet")]
     ];
     rows.forEach(([label,val])=>{
       const d = document.createElement("div");
@@ -1509,7 +1512,7 @@ document.getElementById("statusSearchBtn").addEventListener("click", async ()=>{
       <div class="status-result-row"><span>${t("currentServer")}</span><span>${escapeHtmlPublic(found.server)}</span></div>
       <div class="status-result-row"><span>${t("troopType")}</span><span>${found.troop ? t(found.troop) : t("notSet")}</span></div>
       <div class="status-result-row"><span>${t("allianceLabel")}</span><span>${escapeHtmlPublic(allianceTxt)}</span></div>
-      <div class="status-result-row"><span>${t("score")}</span><span>${escapeHtmlPublic(found.score || t("notSet"))}</span></div>
+      <div class="status-result-row"><span>${t("score")}</span><span>${escapeHtmlPublic(found.score ? formatScoreDisplay(found.score) : t("notSet"))}</span></div>
     </div>
   `;
 });
@@ -1732,6 +1735,17 @@ function parseScoreValue(str){
     num = num / 1000000;
   }
   return num; // "m" or a small unitless number is treated as the base (million) scale
+}
+
+// Shows the normalized "XX.XM" value on cards instead of whatever raw text
+// the applicant typed, so oddly-formatted entries (e.g. "63934827") read
+// cleanly. Falls back to the raw text if it can't be parsed at all.
+function formatScoreDisplay(rawScore){
+  if(!rawScore) return t("notSet");
+  const v = parseScoreValue(rawScore);
+  if(v === null) return rawScore;
+  const rounded = Math.round(v * 10) / 10;
+  return rounded + "M";
 }
 
 // Score tier thresholds (in the same "million" scale as parseScoreValue).
@@ -1960,7 +1974,7 @@ function renderFilteredList(){
           ${allianceLabel ? `<span class="app-alliance-tag">${escapeHtml(allianceLabel)}</span>` : ""}
           ${isDup ? `<span class="app-dup-tag">${t("dupUidTag")}</span>` : ""}
         </div>
-        <div class="app-score-badge tier-${tier}">${escapeHtml(entry.score || t("notSet"))}</div>
+        <div class="app-score-badge tier-${tier}" title="${escapeHtml(entry.score || "")}">${escapeHtml(formatScoreDisplay(entry.score))}</div>
       </div>
       <div class="app-meta" title="UID ${escapeHtml(entry.uid)} / ${escapeHtml(troopLabel)} / ${escapeHtml(powerLabel)}">
         UID <b>${escapeHtml(entry.uid)}</b><span class="sep">·</span><b>${escapeHtml(troopLabel)}</b><span class="sep">·</span><b>${escapeHtml(powerLabel)}</b>
@@ -2033,7 +2047,17 @@ function openDetailModal(entry){
     <div class="detail-row"><span>${t("troopType")}</span><span>${escapeHtml(troopLabel)}</span></div>
     <div class="detail-row"><span>${t("allianceLabel")}</span><span>${escapeHtml(allianceLabel)}</span></div>
     <div class="detail-row"><span>${t("power")}</span><span>${escapeHtml(entry.power || t("notSet"))}</span></div>
-    <div class="detail-row"><span>${t("score")}</span><span><span class="app-score-badge tier-${tier}" style="display:inline-block;">${escapeHtml(entry.score || t("notSet"))}</span></span></div>
+    <div class="detail-row">
+      <span>${t("score")}</span>
+      <span style="display:flex;gap:6px;align-items:center;">
+        <input type="text" id="detailScoreInput" value="${escapeHtml(entry.score || "")}" style="width:100px;background:#0b0d0b;border:1px solid #3a4248;color:var(--console);font-family:'JetBrains Mono',monospace;padding:5px 8px;font-size:12px;outline:none;" />
+        <button id="detailScoreSaveBtn" class="small-btn" style="padding:5px 10px;">${t("tierSettingsSave")}</button>
+      </span>
+    </div>
+    <div class="detail-row">
+      <span></span>
+      <span><span class="app-score-badge tier-${tier}" id="detailScoreBadge" style="display:inline-block;">${escapeHtml(formatScoreDisplay(entry.score))}</span></span>
+    </div>
     <div class="detail-row"><span>${t("colTime")}</span><span>${fmtTime(entry.submittedAt)}</span></div>
     <div class="detail-actions">
       <select class="status-select status-${status}" data-id="${entry.id}">
@@ -2047,6 +2071,31 @@ function openDetailModal(entry){
   bg.style.display = "flex";
 
   document.getElementById("detailModalClose").addEventListener("click", closeDetailModal);
+
+  const scoreInputEl = content.querySelector("#detailScoreInput");
+  const scoreBadgeEl = content.querySelector("#detailScoreBadge");
+  scoreInputEl.addEventListener("input", ()=>{
+    const v = scoreInputEl.value.trim();
+    const previewTier = tierOf(v);
+    scoreBadgeEl.textContent = formatScoreDisplay(v);
+    scoreBadgeEl.className = "app-score-badge tier-" + previewTier;
+  });
+
+  content.querySelector("#detailScoreSaveBtn").addEventListener("click", async ()=>{
+    const newVal = scoreInputEl.value.trim();
+    if(!newVal){ return; }
+    const btn = content.querySelector("#detailScoreSaveBtn");
+    btn.disabled = true;
+    try{
+      await updateApplicationScore(entry.id, newVal);
+      showToast(t("statusUpdated"));
+      closeDetailModal();
+      await renderAdminList();
+    }catch(e){
+      showToast("Error: " + e.message);
+      btn.disabled = false;
+    }
+  });
 
   content.querySelector(".status-select").addEventListener("change", async (e)=>{
     const newStatus = e.target.value;
