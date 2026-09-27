@@ -288,6 +288,19 @@
   .status-result-row:last-child{border-bottom:none;}
   .status-result-row span:first-child{color:var(--text-dim);}
   .status-not-found{text-align:center;color:var(--text-faint);font-size:13px;padding:16px 0;}
+  .status-edit-field{margin-bottom:14px;}
+  .status-edit-field label{display:block;font-size:11.5px;color:var(--text-dim);margin-bottom:6px;}
+  .status-edit-field input, .status-edit-field select{
+    width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--line);
+    padding:10px 11px;color:var(--text);font-size:13.5px;outline:none;font-family:'Noto Sans KR',sans-serif;
+  }
+  .status-edit-field input:focus, .status-edit-field select:focus{border-color:var(--accent);}
+  .status-edit-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .status-edit-save{
+    width:100%;margin-top:6px;background:linear-gradient(135deg,var(--accent2),var(--accent-deep));
+    border:none;padding:12px;color:#1a1310;font-size:13.5px;font-weight:700;cursor:pointer;
+  }
+  .status-locked-note{font-size:12px;color:var(--text-faint);text-align:center;margin-top:12px;line-height:1.6;}
 
   /* ---- admin: console styling, deliberately distinct from the form above ---- */
   .admin-dock{margin:0 16px;font-family:'Cinzel','Noto Sans KR',sans-serif;}
@@ -918,6 +931,9 @@ const I18N = {
     checkStatusTitle: "내 신청 상태 확인",
     checkStatusSearch: "조회",
     checkStatusNotFound: "해당 UID로 접수된 신청 내역이 없습니다.",
+    editSave: "수정 저장",
+    editSaved: "수정 내용이 저장되었습니다.",
+    editLockedNote: "이미 검토가 완료되어 수정할 수 없습니다. 변경이 필요하면 운영진에게 문의해주세요.",
     statusPending: "검토중",
     statusApproved: "승인",
     statusRejected: "거절",
@@ -1013,6 +1029,9 @@ const I18N = {
     checkStatusTitle: "Check My Application Status",
     checkStatusSearch: "Search",
     checkStatusNotFound: "No application found for this UID.",
+    editSave: "Save Changes",
+    editSaved: "Your changes have been saved.",
+    editLockedNote: "This application has already been reviewed and can no longer be edited. Contact staff if you need changes.",
     statusPending: "Pending",
     statusApproved: "Approved",
     statusRejected: "Rejected",
@@ -1108,6 +1127,9 @@ const I18N = {
     checkStatusTitle: "申請状況の確認",
     checkStatusSearch: "検索",
     checkStatusNotFound: "このUIDでの申請は見つかりませんでした。",
+    editSave: "修正を保存",
+    editSaved: "修正内容が保存されました。",
+    editLockedNote: "すでに審査が完了しているため修正できません。変更が必要な場合は運営スタッフにご連絡ください。",
     statusPending: "審査中",
     statusApproved: "承認",
     statusRejected: "却下",
@@ -1203,6 +1225,9 @@ const I18N = {
     checkStatusTitle: "查询申请状态",
     checkStatusSearch: "查询",
     checkStatusNotFound: "未找到该UID的申请记录。",
+    editSave: "保存修改",
+    editSaved: "修改内容已保存。",
+    editLockedNote: "该申请已审核完毕，无法修改。如需变更请联系管理团队。",
     statusPending: "审核中",
     statusApproved: "已批准",
     statusRejected: "已拒绝",
@@ -1350,6 +1375,9 @@ async function updateApplicationStatus(id, status){
 }
 async function updateApplicationScore(id, score){
   await db.collection(COLLECTION).doc(id).update({score});
+}
+async function updateApplicationFields(id, data){
+  await db.collection(COLLECTION).doc(id).update(data);
 }
 async function findByUid(uid){
   try{
@@ -1511,21 +1539,107 @@ document.getElementById("statusSearchBtn").addEventListener("click", async ()=>{
     resultEl.innerHTML = `<div class="status-not-found">${t("checkStatusNotFound")}</div>`;
     return;
   }
+  renderStatusResult(found);
+});
+
+function renderStatusResult(found){
+  const resultEl = document.getElementById("statusResult");
   const status = found.status || "pending";
+  const isEditable = status === "pending";
   const allianceTxt = found.alliance ? allianceDisplayPublic(found.alliance) : t("notSet");
+
+  if(!isEditable){
+    resultEl.innerHTML = `
+      <div class="status-result-card">
+        <div class="status-badge-row">
+          <strong>${escapeHtmlPublic(found.nickname)}</strong>
+          <span class="status-badge ${status}">${statusLabel(status)}</span>
+        </div>
+        <div class="status-result-row"><span>${t("currentServer")}</span><span>${escapeHtmlPublic(found.server)}</span></div>
+        <div class="status-result-row"><span>${t("troopType")}</span><span>${found.troop ? t(found.troop) : t("notSet")}</span></div>
+        <div class="status-result-row"><span>${t("allianceLabel")}</span><span>${escapeHtmlPublic(allianceTxt)}</span></div>
+        <div class="status-result-row"><span>${t("score")}</span><span>${escapeHtmlPublic(found.score ? formatScoreDisplay(found.score) : t("notSet"))}</span></div>
+      </div>
+      <div class="status-locked-note">${t("editLockedNote")}</div>
+    `;
+    return;
+  }
+
   resultEl.innerHTML = `
     <div class="status-result-card">
       <div class="status-badge-row">
         <strong>${escapeHtmlPublic(found.nickname)}</strong>
         <span class="status-badge ${status}">${statusLabel(status)}</span>
       </div>
-      <div class="status-result-row"><span>${t("currentServer")}</span><span>${escapeHtmlPublic(found.server)}</span></div>
-      <div class="status-result-row"><span>${t("troopType")}</span><span>${found.troop ? t(found.troop) : t("notSet")}</span></div>
-      <div class="status-result-row"><span>${t("allianceLabel")}</span><span>${escapeHtmlPublic(allianceTxt)}</span></div>
-      <div class="status-result-row"><span>${t("score")}</span><span>${escapeHtmlPublic(found.score ? formatScoreDisplay(found.score) : t("notSet"))}</span></div>
+      <div class="status-result-row"><span>UID</span><span>${escapeHtmlPublic(found.uid)}</span></div>
+    </div>
+    <div style="margin-top:16px;">
+      <div class="status-edit-field">
+        <label for="edit-nick">${t("nickname")}</label>
+        <input id="edit-nick" type="text" value="${escapeHtmlPublic(found.nickname)}">
+      </div>
+      <div class="status-edit-field">
+        <label for="edit-server">${t("currentServer")}</label>
+        <input id="edit-server" type="text" value="${escapeHtmlPublic(found.server)}">
+      </div>
+      <div class="status-edit-row2">
+        <div class="status-edit-field">
+          <label for="edit-troop">${t("troopType")}</label>
+          <select id="edit-troop">
+            <option value="" ${!found.troop?"selected":""}>${t("notSet")}</option>
+            <option value="fighter" ${found.troop==="fighter"?"selected":""}>${t("fighter")}</option>
+            <option value="shooter" ${found.troop==="shooter"?"selected":""}>${t("shooter")}</option>
+            <option value="rider" ${found.troop==="rider"?"selected":""}>${t("rider")}</option>
+          </select>
+        </div>
+        <div class="status-edit-field">
+          <label for="edit-alliance">${t("allianceLabel")}</label>
+          <select id="edit-alliance">
+            <option value="" ${!found.alliance?"selected":""}>-</option>
+            <option value="z3ro" ${found.alliance==="z3ro"?"selected":""}>Z3RO</option>
+            <option value="owo" ${found.alliance==="owo"?"selected":""}>OWO</option>
+            <option value="neco" ${found.alliance==="neco"?"selected":""}>NECO</option>
+            <option value="kuon" ${found.alliance==="kuon"?"selected":""}>KUON</option>
+            <option value="tbd" ${found.alliance==="tbd"?"selected":""}>${t("allianceTbd")}</option>
+          </select>
+        </div>
+      </div>
+      <div class="status-edit-field">
+        <label for="edit-power">${t("power")}</label>
+        <input id="edit-power" type="text" value="${escapeHtmlPublic(found.power || "")}">
+      </div>
+      <div class="status-edit-field">
+        <label for="edit-score">${t("score")} <span style="color:var(--accent);">*</span></label>
+        <input id="edit-score" type="text" value="${escapeHtmlPublic(found.score || "")}">
+      </div>
+      <button class="status-edit-save" id="editSaveBtn">${t("editSave")}</button>
     </div>
   `;
-});
+
+  document.getElementById("editSaveBtn").addEventListener("click", async ()=>{
+    const nickname = document.getElementById("edit-nick").value.trim();
+    const server = document.getElementById("edit-server").value.trim();
+    const troop = document.getElementById("edit-troop").value;
+    const alliance = document.getElementById("edit-alliance").value;
+    const power = document.getElementById("edit-power").value.trim();
+    const score = document.getElementById("edit-score").value.trim();
+    if(!nickname || !server || !score){
+      showToast(t("requiredError"));
+      return;
+    }
+    const btn = document.getElementById("editSaveBtn");
+    btn.disabled = true;
+    try{
+      const updated = { nickname, server, troop, alliance, power, score };
+      await updateApplicationFields(found.id, updated);
+      showToast(t("editSaved"));
+      renderStatusResult(Object.assign({}, found, updated));
+    }catch(e){
+      showToast("Error: " + e.message);
+      btn.disabled = false;
+    }
+  });
+}
 function escapeHtmlPublic(str){
   const div = document.createElement("div");
   div.textContent = str == null ? "" : String(str);
