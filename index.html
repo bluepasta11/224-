@@ -491,7 +491,7 @@
   .detail-nickname{font-size:19px;font-weight:700;color:#f5eddc;word-break:break-all;}
   .detail-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #182019;font-size:13px;}
   .detail-row:last-of-type{border-bottom:none;}
-  .detail-row span:first-child{color:var(--console-dim);flex-shrink:0;}
+  .detail-row > label, .detail-row span:first-child{color:var(--console-dim);flex-shrink:0;}
   .detail-row span:last-child{color:#e6dcc8;text-align:right;word-break:break-all;}
   .detail-actions{display:flex;gap:8px;margin-top:18px;align-items:center;}
   .detail-actions .status-select{flex:1;padding:9px;font-size:12.5px;}
@@ -2209,7 +2209,17 @@ function openDetailModal(entry){
     <div class="detail-row"><span>${t("currentServer")}</span><span>${escapeHtml(entry.server)}</span></div>
     <div class="detail-row"><span>UID</span><span class="mono">${escapeHtml(entry.uid)}</span></div>
     <div class="detail-row"><span>${t("troopType")}</span><span>${escapeHtml(troopLabel)}</span></div>
-    <div class="detail-row"><span>${t("allianceLabel")}</span><span>${escapeHtml(allianceLabel)}</span></div>
+    <div class="detail-row">
+      <label for="detailAllianceSel">${t("allianceLabel")}</label>
+      <select id="detailAllianceSel" class="filter-select">
+        <option value="" ${!entry.alliance?"selected":""}>-</option>
+        <option value="z3ro" ${entry.alliance==="z3ro"?"selected":""}>Z3RO</option>
+        <option value="owo" ${entry.alliance==="owo"?"selected":""}>OWO</option>
+        <option value="neco" ${entry.alliance==="neco"?"selected":""}>NECO</option>
+        <option value="kuon" ${entry.alliance==="kuon"?"selected":""}>KUON</option>
+        <option value="tbd" ${entry.alliance==="tbd"?"selected":""}>${t("allianceTbd")}</option>
+      </select>
+    </div>
     <div class="detail-row"><span>${t("power")}</span><span>${escapeHtml(entry.power || t("notSet"))}</span></div>
     <div class="detail-row">
       <span>${t("score")}</span>
@@ -2259,6 +2269,19 @@ function openDetailModal(entry){
       showToast("Error: " + e.message);
       btn.disabled = false;
     }
+  });
+
+  content.querySelector("#detailAllianceSel").addEventListener("change", async (e)=>{
+    e.target.disabled = true;
+    try{
+      await updateApplicationFields(entry.id, { alliance: e.target.value });
+      entry.alliance = e.target.value;
+      showToast(t("statusUpdated"));
+      await renderAdminList();
+    }catch(err){
+      showToast("Error: " + err.message);
+    }
+    e.target.disabled = false;
   });
 
   content.querySelector(".status-select").addEventListener("change", async (e)=>{
